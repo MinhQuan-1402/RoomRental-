@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { authRouter } from '../modules/auth/auth.routes';
 import { roomsRouter } from '../modules/rooms/rooms.routes';
 import { contractsRouter } from '../modules/contracts/contracts.routes';
+import { dashboardRouter } from '../modules/dashboard/dashboard.routes';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { authorizeRoles } from '../middlewares/role.middleware';
 import { env } from '../config/env';
@@ -27,6 +28,9 @@ router.use('/rooms', roomsRouter);
 
 // Contracts: tenant self-service endpoint
 router.use('/contracts', contractsRouter);
+
+// Dashboard: landlord stats
+router.use('/dashboard', dashboardRouter);
 
 // Dev-only route to verify LANDLORD role authorization works.
 if (env.NODE_ENV !== 'production') {
