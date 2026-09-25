@@ -1,0 +1,89 @@
+/**
+ * RoomRental — Design Tokens (CSS Variables)
+ * Đồng bộ với design-tokens.md — mọi thay đổi phải cập nhật cả 2 file.
+ */
+
+:root {
+  /* 1. Brand Colors */
+  --brand-primary: #0F766E;          /* teal-700 */
+  --brand-primary-hover: #115E59;     /* teal-800 */
+  --brand-primary-active: #134E4A;    /* teal-900 */
+  --brand-primary-tint: #5EEAD4;      /* teal-300 */
+  --brand-primary-soft: #CCFBF1;      /* teal-100 */
+  --brand-primary-softer: #F0FDFA;    /* teal-50 */
+
+  /* 2. Surfaces */
+  --surface-canvas: #F8FAFC;          /* slate-50 */
+  --surface-canvas-alt: #FAF8FF;
+  --surface-card: #FFFFFF;
+  --surface-card-muted: #F1F5F9;      /* slate-100 */
+  --surface-overlay: rgba(15, 23, 42, 0.6);
+
+  /* 3. Borders */
+  --border-default: #E2E8F0;         /* slate-200 */
+  --border-strong: #CBD5E1;          /* slate-300 */
+  --border-subtle: #F1F5F9;          /* slate-100 */
+
+  /* 4. Typography */
+  --text-heading: #0F172A;           /* slate-900 */
+  --text-body: #334155;              /* slate-700 */
+  --text-label: #64748B;             /* slate-500 */
+  --text-disabled: #94A3B8;          /* slate-400 */
+  --text-inverse: #FFFFFF;
+  --text-link: #0F766E;
+
+  /* 5. Semantic Status */
+  --status-success: #059669;         /* emerald-600 */
+  --status-success-soft: #D1FAE5;
+  --status-success-border: #A7F3D0;
+
+  --status-info: #0284C7;            /* sky-600 */
+  --status-info-soft: #E0F2FE;
+  --status-info-border: #BAE6FD;
+
+  --status-warning: #D97706;         /* amber-600 */
+  --status-warning-soft: #FEF3C7;
+  --status-warning-border: #FDE68A;
+
+  --status-danger: #DC2626;          /* red-600 */
+  --status-danger-soft: #FEE2E2;
+  --status-danger-border: #FECACA;
+
+  /* 6. Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  /* 7. Shadows */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px rgba(15, 23, 42, 0.08), 0 4px 6px rgba(15, 23, 42, 0.04);
+  --shadow-focus: 0 0 0 3px rgba(15, 118, 110, 0.15);
+
+  /* 8. Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-base: 16px;
+  --space-lg: 20px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 40px;
+
+  /* 9. Type scale */
+  --font-display: 32px;
+  --font-h1: 26px;
+  --font-h2: 20px;
+  --font-h3: 17px;
+  --font-body: 14px;
+  --font-label: 13px;
+  --font-caption: 12px;
+
+  /* Status color helpers (cho inline style ring/icon) */
+  --ring-primary: rgba(15, 118, 110, 0.5);
+  --soft-primary: rgba(15, 118, 110, 0.06);
+}

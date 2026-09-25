@@ -1,0 +1,92 @@
+@import '../lib/design-tokens.css';
+@import "tailwindcss";
+
+/* ─── Tailwind theme: ánh xạ design tokens cũ sang CSS variables của Tailwind ─── */
+@theme inline {
+  /* Brand */
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-primary-active: var(--brand-primary-active);
+  --color-brand-tint: var(--brand-primary-tint);
+  --color-brand-soft: var(--brand-primary-soft);
+  --color-brand-softer: var(--brand-primary-softer);
+
+  /* Surfaces */
+  --color-canvas: var(--surface-canvas);
+  --color-card: var(--surface-card);
+  --color-card-muted: var(--surface-card-muted);
+
+  /* Borders */
+  --color-border: var(--border-default);
+  --color-border-strong: var(--border-strong);
+  --color-border-subtle: var(--border-subtle);
+
+  /* Text */
+  --color-heading: var(--text-heading);
+  --color-body: var(--text-body);
+  --color-label: var(--text-label);
+  --color-disabled: var(--text-disabled);
+  --color-inverse: var(--text-inverse);
+
+  /* Status */
+  --color-success: var(--status-success);
+  --color-success-soft: var(--status-success-soft);
+  --color-info: var(--status-info);
+  --color-info-soft: var(--status-info-soft);
+  --color-warning: var(--status-warning);
+  --color-warning-soft: var(--status-warning-soft);
+  --color-danger: var(--status-danger);
+  --color-danger-soft: var(--status-danger-soft);
+
+  /* Radius */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+
+  /* Shadows */
+  --shadow-card: var(--shadow-sm);
+  --shadow-card-hover: var(--shadow-lg);
+}
+
+/* ─── Keyframes ─────────────────────────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Reset ─────────────────────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+/* Brand teal focus ring — thay vì indigo mặc định */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2);
+}
