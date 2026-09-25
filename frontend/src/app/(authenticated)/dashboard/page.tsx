@@ -156,14 +156,30 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, tone, icon, delta, su
         minHeight: 132,
       }}
     >
-      <div className="flex items-start justify-between mb-3">
+      {/* Header row: label trái + icon phải (cùng hàng) */}
+      <div className="flex items-center justify-between mb-3">
         <div
-          className="w-11 h-11 rounded-xl flex items-center justify-center"
+          className="text-[13px] font-medium uppercase tracking-wider"
+          style={{ color: "var(--text-label)" }}
+        >
+          {label}
+        </div>
+        <div
+          className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
           style={{ backgroundColor: t.iconBg, color: t.iconColor }}
         >
           {icon}
         </div>
-        {delta && (
+      </div>
+
+      {/* Big value */}
+      <div className="text-[28px] font-bold leading-none" style={{ color: "var(--text-heading)" }}>
+        {value}
+      </div>
+
+      {/* Optional delta chip */}
+      {delta && (
+        <div className="mt-2">
           <span
             className="inline-flex items-center gap-0.5 text-[11px] font-semibold px-2 py-0.5 rounded-full"
             style={{
@@ -173,17 +189,9 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, tone, icon, delta, su
           >
             {delta.up ? "▲" : "▼"} {delta.value}
           </span>
-        )}
-      </div>
-      <div
-        className="text-[13px] font-medium uppercase tracking-wider mb-1"
-        style={{ color: "var(--text-label)" }}
-      >
-        {label}
-      </div>
-      <div className="text-[28px] font-bold leading-none" style={{ color: "var(--text-heading)" }}>
-        {value}
-      </div>
+        </div>
+      )}
+
       {(sublabel || link) && (
         <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{ borderColor: "var(--border-subtle)" }}>
           {sublabel && (
@@ -351,7 +359,7 @@ function LandlordDashboard() {
   if (error || !stats) return <CenterError message={error ?? "Không có dữ liệu"} />;
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-7">
       {/* ─── Header với gradient background ──────────────────────────────── */}
       <div
         className="relative overflow-hidden rounded-2xl px-8 py-7"
