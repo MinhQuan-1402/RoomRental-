@@ -250,24 +250,24 @@ function TenantRoomCard({ room }: { room: AvailableRoom }) {
         <img
           src={img}
           alt={`Phòng ${room.roomNumber}`}
-          className="w-full h-44 object-cover block"
+          className="w-full h-48 object-cover block"
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = "none";
           }}
         />
       ) : (
         <div
-          className={`w-full h-44 bg-gradient-to-br ${hueBg} flex items-center justify-center`}
+          className={`w-full h-48 bg-gradient-to-br ${hueBg} flex items-center justify-center`}
         >
-          <svg className="w-12 h-12 text-slate-400/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-14 h-14 text-slate-400/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
         </div>
       )}
-      <div className="p-5 flex flex-col gap-2.5 flex-1">
+      <div className="p-6 flex flex-col gap-3 flex-1">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-[15px] font-bold text-slate-900 m-0 leading-tight">
+          <h3 className="text-[16px] font-bold text-slate-900 m-0 leading-tight">
             Phòng {room.roomNumber}
           </h3>
           <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 shrink-0">
@@ -283,11 +283,11 @@ function TenantRoomCard({ room }: { room: AvailableRoom }) {
           <span className="leading-snug">{room.address}</span>
         </div>
         {room.description && (
-          <p className="text-[12px] text-slate-500 m-0 line-clamp-2 leading-relaxed">
+          <p className="text-[12.5px] text-slate-500 m-0 line-clamp-2 leading-relaxed">
             {room.description}
           </p>
         )}
-        <div className="flex flex-wrap gap-1.5 mt-1">
+        <div className="flex flex-wrap gap-1.5">
           {room.area && (
             <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
               {room.area} m²
@@ -299,17 +299,17 @@ function TenantRoomCard({ room }: { room: AvailableRoom }) {
             </span>
           )}
         </div>
-        <div className="flex items-end justify-between mt-auto pt-3.5 border-t border-slate-100">
+        <div className="flex items-end justify-between mt-auto pt-4 border-t border-slate-100">
           <div>
             <div className="text-[10.5px] text-slate-500 uppercase tracking-wider font-semibold">
               Giá thuê
             </div>
-            <div className="text-base font-bold text-teal-700 mt-0.5">
+            <div className="text-[17px] font-bold text-teal-700 mt-0.5">
               {VND(room.price)}
               <span className="text-xs text-slate-500 ml-0.5 font-medium">/tháng</span>
             </div>
           </div>
-          <button className="inline-flex items-center gap-1.5 bg-teal-600 text-white text-[13px] font-semibold rounded-lg px-3.5 py-2 border-none hover:bg-teal-700 shadow-sm hover:shadow-md transition">
+          <button className="inline-flex items-center gap-1.5 bg-teal-600 text-white text-[13px] font-semibold rounded-lg px-4 py-2.5 border-none hover:bg-teal-700 shadow-sm hover:shadow-md transition">
             Xem chi tiết
             <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
@@ -337,46 +337,51 @@ function TenantHero({
   })();
 
   return (
-    <div className="relative overflow-hidden rounded-2xl mb-6 bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800 shadow-lg">
-      <div className="absolute inset-0 opacity-25 pointer-events-none">
-        <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-white/30 blur-3xl" />
-        <div className="absolute -bottom-16 -left-8 w-72 h-72 rounded-full bg-emerald-300/40 blur-3xl" />
+    <div className="relative overflow-hidden rounded-3xl mb-8 bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800 shadow-xl">
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute -top-16 -right-16 w-80 h-80 rounded-full bg-white/30 blur-3xl" />
+        <div className="absolute -bottom-20 -left-8 w-96 h-96 rounded-full bg-emerald-300/40 blur-3xl" />
+        <div className="absolute top-1/2 right-1/3 w-40 h-40 rounded-full bg-teal-300/20 blur-2xl" />
       </div>
-      <div className="relative px-8 py-7 flex items-center gap-5 flex-wrap">
-        <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center text-white font-bold text-xl shrink-0 shadow-lg">
+
+      <div className="relative px-10 py-10 flex items-center gap-8 flex-wrap">
+        <div className="w-20 h-20 rounded-3xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center text-white font-bold text-2xl shrink-0 shadow-2xl">
           {initials}
         </div>
-        <div className="text-white flex-1 min-w-[240px]">
-          <div className="text-teal-100 text-[11px] font-semibold uppercase tracking-wider mb-1.5">
+        <div className="text-white flex-1 min-w-[280px]">
+          <div className="text-teal-100 text-[11px] font-semibold uppercase tracking-[0.12em] mb-2">
             Tổng quan cá nhân
           </div>
-          <h1 className="text-[26px] font-bold tracking-tight leading-tight">
+          <h1 className="text-3xl font-bold tracking-tight leading-tight">
             Xin chào, {user.fullName} 👋
           </h1>
-          <p className="text-teal-100/90 text-[13.5px] mt-1">
+          <p className="text-teal-100/90 text-[14px] mt-2 max-w-xl leading-relaxed">
             {contract
-              ? "Đây là thông tin phòng và hợp đồng bạn đang thuê."
-              : "Khám phá các phòng trống và tìm nơi ở phù hợp với bạn."}
+              ? "Đây là thông tin phòng và hợp đồng bạn đang thuê. Cập nhật mọi thứ ngay tại đây."
+              : "Khám phá các phòng trống và tìm nơi ở phù hợp với bạn trong vài cú nhấp."}
           </p>
+          {contract ? (
+            <div className="flex gap-2 flex-wrap mt-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm border border-white/25 text-white text-[12px] font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+                Hợp đồng đang hiệu lực
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 text-teal-50 text-[12px] font-medium">
+                Phòng {contract.room.roomNumber}
+              </span>
+            </div>
+          ) : (
+            <a
+              href="/rooms"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-white text-teal-700 rounded-2xl font-semibold text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 mt-4"
+            >
+              Xem tất cả phòng
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </a>
+          )}
         </div>
-        {contract ? (
-          <div className="flex gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm border border-white/25 text-white text-[12px] font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
-              Hợp đồng đang hiệu lực
-            </span>
-          </div>
-        ) : (
-          <a
-            href="/rooms"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-teal-700 rounded-xl font-semibold text-sm shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
-          >
-            Xem tất cả phòng
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </a>
-        )}
       </div>
     </div>
   );
@@ -401,93 +406,93 @@ function TenantKpis({ contract }: { contract: MyActiveContract }) {
   const remainingDays = Math.max(totalDays - passedDays, 0);
   const progressPct = Math.round((passedDays / totalDays) * 100);
 
+  const kpis = [
+    {
+      label: "Giá thuê / tháng",
+      value: VNDCompact(contract.rentPrice),
+      sub: "HĐ hiện tại",
+      accent: "from-teal-500 to-emerald-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23" />
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+      ),
+    },
+    {
+      label: "Tiền đặt cọc",
+      value: VNDCompact(contract.deposit),
+      sub: "Đã ký quỹ",
+      accent: "from-violet-500 to-purple-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2" />
+          <path d="M2 10h20" />
+        </svg>
+      ),
+    },
+    {
+      label: "Ngày thanh toán",
+      value: `Ngày ${contract.billingDay}`,
+      sub: "Hàng tháng",
+      accent: "from-amber-500 to-orange-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+      ),
+    },
+    {
+      label: "Còn lại HĐ",
+      value: `${remainingDays} ngày`,
+      sub: `${progressPct}% đã qua`,
+      accent: "from-sky-500 to-blue-600",
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      ),
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div className="relative bg-white rounded-2xl border border-slate-200 shadow-sm p-5 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-2xl bg-gradient-to-br from-teal-500 to-emerald-600" />
-        <div className="relative flex items-center justify-between mb-3">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Giá thuê
-          </span>
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white bg-gradient-to-br from-teal-500 to-emerald-600 shadow-sm">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23" />
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {kpis.map((k) => (
+        <div
+          key={k.label}
+          className="relative bg-white rounded-2xl border border-slate-200 shadow-sm p-6 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+        >
+          <div
+            className={`absolute -top-12 -right-12 w-36 h-36 rounded-full opacity-10 blur-2xl bg-gradient-to-br ${k.accent}`}
+          />
+          <div className="relative flex items-center justify-between mb-4">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-500">
+              {k.label}
+            </span>
+            <div
+              className={`w-11 h-11 rounded-2xl flex items-center justify-center text-white bg-gradient-to-br ${k.accent} shadow-md`}
+            >
+              {k.icon}
+            </div>
+          </div>
+          <div className="relative text-[24px] font-bold leading-tight text-slate-900">
+            {k.value}
+          </div>
+          <div className="relative text-[12px] text-slate-500 mt-2 font-medium">
+            {k.sub}
           </div>
         </div>
-        <div className="relative text-[20px] font-bold leading-tight text-slate-900">
-          {VNDCompact(contract.rentPrice)}
-        </div>
-        <div className="relative text-[11px] text-slate-500 mt-1">/tháng</div>
-      </div>
-
-      <div className="relative bg-white rounded-2xl border border-slate-200 shadow-sm p-5 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-2xl bg-gradient-to-br from-violet-500 to-purple-600" />
-        <div className="relative flex items-center justify-between mb-3">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Tiền cọc
-          </span>
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white bg-gradient-to-br from-violet-500 to-purple-600 shadow-sm">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="6" width="20" height="12" rx="2" />
-              <path d="M2 10h20" />
-            </svg>
-          </div>
-        </div>
-        <div className="relative text-[20px] font-bold leading-tight text-slate-900">
-          {VNDCompact(contract.deposit)}
-        </div>
-        <div className="relative text-[11px] text-slate-500 mt-1">đã đặt cọc</div>
-      </div>
-
-      <div className="relative bg-white rounded-2xl border border-slate-200 shadow-sm p-5 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-2xl bg-gradient-to-br from-amber-500 to-orange-600" />
-        <div className="relative flex items-center justify-between mb-3">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Ngày thanh toán
-          </span>
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white bg-gradient-to-br from-amber-500 to-orange-600 shadow-sm">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
-          </div>
-        </div>
-        <div className="relative text-[20px] font-bold leading-tight text-slate-900">
-          Ngày {contract.billingDay}
-        </div>
-        <div className="relative text-[11px] text-slate-500 mt-1">hàng tháng</div>
-      </div>
-
-      <div className="relative bg-white rounded-2xl border border-slate-200 shadow-sm p-5 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-2xl bg-gradient-to-br from-sky-500 to-blue-600" />
-        <div className="relative flex items-center justify-between mb-3">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Còn lại
-          </span>
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white bg-gradient-to-br from-sky-500 to-blue-600 shadow-sm">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
-          </div>
-        </div>
-        <div className="relative text-[20px] font-bold leading-tight text-slate-900">
-          {remainingDays} ngày
-        </div>
-        <div className="relative text-[11px] text-slate-500 mt-1">
-          của tổng {totalDays} ngày
-        </div>
-      </div>
+      ))}
     </div>
   );
 }
 
-// ─── Tenant rented room card ──────────────────────────────────────────────────
-function TenantRentedCard({ contract }: { contract: MyActiveContract }) {
+// ─── Tenant overview panel (sidebar thông tin) ────────────────────────────────
+function TenantOverviewPanel({ contract }: { contract: MyActiveContract }) {
   const startDate = new Date(contract.startDate);
   const endDate = new Date(contract.endDate);
   const now = new Date();
@@ -502,28 +507,118 @@ function TenantRentedCard({ contract }: { contract: MyActiveContract }) {
     ),
     0
   );
+  const remainingDays = Math.max(totalDays - passedDays, 0);
   const progressPct = Math.round((passedDays / totalDays) * 100);
 
+  const statusLabel =
+    contract.status === "ACTIVE" ? "Hiệu lực" :
+    contract.status === "PENDING" ? "Chờ ký" :
+    contract.status === "EXPIRED" ? "Hết hạn" :
+    contract.status === "TERMINATED" ? "Đã hủy" : contract.status;
+
+  const statusClass =
+    contract.status === "ACTIVE"
+      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+      : contract.status === "PENDING"
+      ? "bg-amber-50 text-amber-700 border-amber-200"
+      : "bg-slate-100 text-slate-600 border-slate-200";
+
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-      {/* Top accent stripe */}
+    <aside className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden h-fit">
+      <div className="h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500" />
+      <div className="px-6 pt-6 pb-5">
+        <div className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-slate-500 mb-3">
+          Trạng thái hợp đồng
+        </div>
+        <span
+          className={`inline-flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1.5 rounded-full border ${statusClass}`}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${
+            contract.status === "ACTIVE" ? "bg-emerald-500 animate-pulse" : "bg-current"
+          }`} />
+          {statusLabel}
+        </span>
+
+        <div className="mt-6 space-y-4">
+          <div>
+            <div className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-slate-500 mb-1.5">
+              Ngày bắt đầu
+            </div>
+            <div className="text-[14px] font-semibold text-slate-900">
+              {formatDate(contract.startDate)}
+            </div>
+          </div>
+          <div>
+            <div className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-slate-500 mb-1.5">
+              Ngày kết thúc
+            </div>
+            <div className="text-[14px] font-semibold text-slate-900">
+              {formatDate(contract.endDate)}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-slate-100">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+              Tiến độ
+            </span>
+            <span className="text-[12px] font-bold text-teal-700">
+              {progressPct}%
+            </span>
+          </div>
+          <div className="relative h-2.5 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between mt-2 text-[11px] text-slate-500 font-medium">
+            <span>{passedDays} ngày đã qua</span>
+            <span>Còn {remainingDays} ngày</span>
+          </div>
+        </div>
+
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          <a
+            href="/contracts"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-teal-600 text-white rounded-xl text-[12.5px] font-semibold hover:bg-teal-700 shadow-sm hover:shadow-md transition"
+          >
+            Chi tiết
+          </a>
+          <a
+            href="/invoices"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-[12.5px] font-semibold hover:bg-slate-50 hover:border-slate-300 transition"
+          >
+            Hóa đơn
+          </a>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+// ─── Tenant rented room card ──────────────────────────────────────────────────
+function TenantRentedCard({ contract }: { contract: MyActiveContract }) {
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden h-fit">
       <div className="h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500" />
 
-      <div className="p-6">
+      <div className="p-8">
         {/* Title row */}
-        <div className="flex items-start justify-between flex-wrap gap-4 mb-5">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md">
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div className="flex items-start justify-between flex-wrap gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg shrink-0">
+              <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                 <polyline points="9 22 9 12 15 12 15 22" />
               </svg>
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900 m-0 leading-tight">
+              <h2 className="text-2xl font-bold text-slate-900 m-0 leading-tight">
                 Phòng {contract.room.roomNumber}
               </h2>
-              <div className="flex items-start gap-1.5 text-[13px] text-slate-500 mt-1">
+              <div className="flex items-start gap-1.5 text-[13px] text-slate-500 mt-1.5">
                 <svg className="w-3.5 h-3.5 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                   <circle cx="12" cy="10" r="3" />
@@ -539,61 +634,50 @@ function TenantRentedCard({ contract }: { contract: MyActiveContract }) {
         </div>
 
         {/* Info grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-5">
-          <TenantInfoItem label="Diện tích" value={contract.room.area ? `${contract.room.area} m²` : "—"} />
-          <TenantInfoItem label="Tầng" value={contract.room.floor !== null ? `Tầng ${contract.room.floor}` : "—"} />
-          <TenantInfoItem label="Trạng thái HĐ" value={
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${
-              contract.status === "ACTIVE"
-                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                : "bg-amber-50 text-amber-700 border border-amber-200"
-            }`}>
-              {contract.status === "ACTIVE" ? "● Hiệu lực" : contract.status}
-            </span>
-          } />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mb-6">
+          <TenantInfoItem
+            label="Diện tích"
+            value={contract.room.area ? `${contract.room.area} m²` : "—"}
+          />
+          <TenantInfoItem
+            label="Tầng"
+            value={contract.room.floor !== null ? `Tầng ${contract.room.floor}` : "—"}
+          />
+          <TenantInfoItem
+            label="Tiền thuê / tháng"
+            value={
+              <span className="text-teal-700">{VND(contract.rentPrice)}</span>
+            }
+          />
+          <TenantInfoItem
+            label="Tiền cọc"
+            value={VND(contract.deposit)}
+          />
+          <TenantInfoItem
+            label="Ngày thanh toán"
+            value={`Ngày ${contract.billingDay} hàng tháng`}
+          />
+          <TenantInfoItem label="Mã hợp đồng" value={`#CT-${contract.id}`} />
         </div>
 
         {/* Description */}
         {contract.room.description && (
-          <div className="bg-slate-50 rounded-xl px-4 py-3 mb-5">
-            <div className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl px-5 py-4 mb-6 border border-slate-100">
+            <div className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-slate-500 mb-1.5">
               Mô tả phòng
             </div>
-            <p className="text-[13px] text-slate-700 m-0 leading-relaxed">
+            <p className="text-[13.5px] text-slate-700 m-0 leading-relaxed">
               {contract.room.description}
             </p>
           </div>
         )}
 
-        {/* Contract timeline */}
-        <div className="border-t border-slate-100 pt-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              Thời hạn hợp đồng
-            </div>
-            <div className="text-[12px] font-medium text-slate-700">
-              {formatDate(contract.startDate)} → {formatDate(contract.endDate)}
-            </div>
-          </div>
-          <div className="relative h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
-          <div className="flex items-center justify-between mt-2 text-[11px] text-slate-500">
-            <span>Đã qua {passedDays} ngày</span>
-            <span>{progressPct}%</span>
-            <span>Còn {Math.max(totalDays - passedDays, 0)} ngày</span>
-          </div>
-        </div>
-
         {contract.terms && (
-          <div className="mt-5 pt-5 border-t border-slate-100">
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">
-              Điều khoản
+          <div className="mt-6 pt-6 border-t border-slate-100">
+            <div className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-slate-500 mb-2">
+              Điều khoản hợp đồng
             </div>
-            <p className="text-[13px] text-slate-700 m-0 leading-relaxed whitespace-pre-line">
+            <p className="text-[13.5px] text-slate-700 m-0 leading-relaxed whitespace-pre-line">
               {contract.terms}
             </p>
           </div>
@@ -606,10 +690,10 @@ function TenantRentedCard({ contract }: { contract: MyActiveContract }) {
 function TenantInfoItem({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
-      <div className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
+      <div className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-slate-500 mb-1.5">
         {label}
       </div>
-      <div className="text-[13.5px] font-medium text-slate-900">{value}</div>
+      <div className="text-[14px] font-semibold text-slate-900">{value}</div>
     </div>
   );
 }
@@ -617,19 +701,22 @@ function TenantInfoItem({ label, value }: { label: string; value: React.ReactNod
 // ─── Browse empty rooms ───────────────────────────────────────────────────────
 function TenantBrowse({ rooms }: { rooms: AvailableRoom[] }) {
   return (
-    <div>
-      <div className="mb-5 flex items-end justify-between gap-3 flex-wrap">
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8">
+      <div className="mb-6 flex items-end justify-between gap-3 flex-wrap">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 m-0 mb-1">
+          <div className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-teal-600 mb-1.5">
+            Khám phá
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 m-0 mb-1.5">
             Phòng trống hiện có
           </h2>
-          <p className="text-[13px] text-slate-500 m-0">
+          <p className="text-[13px] text-slate-500 m-0 max-w-xl">
             Danh sách phòng đang cho thuê — chọn phòng phù hợp để ký hợp đồng.
           </p>
         </div>
         <a
           href="/rooms"
-          className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-teal-600 hover:text-teal-700 hover:bg-teal-50 px-3 py-1.5 rounded-lg transition"
+          className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-teal-600 hover:text-teal-700 hover:bg-teal-50 px-3 py-2 rounded-lg transition"
         >
           Xem tất cả
           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -639,33 +726,104 @@ function TenantBrowse({ rooms }: { rooms: AvailableRoom[] }) {
       </div>
 
       {rooms.length === 0 ? (
-        <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl py-14 px-6 flex flex-col items-center text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <div className="bg-gradient-to-br from-slate-50 to-slate-100/30 border-2 border-dashed border-slate-200 rounded-2xl py-16 px-6 flex flex-col items-center text-center">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center mb-4 shadow-inner">
+            <svg className="w-10 h-10 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
           </div>
-          <h3 className="text-base font-semibold text-slate-700 mb-1">
+          <h3 className="text-base font-semibold text-slate-700 mb-1.5">
             Hiện chưa có phòng trống
           </h3>
-          <p className="text-[13px] text-slate-500 mb-5 max-w-sm">
+          <p className="text-[13px] text-slate-500 mb-6 max-w-sm">
             Vui lòng quay lại sau — chủ trọ đang cập nhật phòng mới.
           </p>
           <a
             href="/contracts"
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg text-[13px] font-semibold hover:bg-teal-700 transition"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-teal-600 text-white rounded-xl text-[13px] font-semibold hover:bg-teal-700 shadow-sm hover:shadow-md transition"
           >
             Xem hợp đồng của tôi
           </a>
         </div>
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
           {rooms.slice(0, 6).map((r) => (
             <TenantRoomCard key={r.id} room={r} />
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── Quick actions / tips (lấp đầy khoảng trống) ─────────────────────────────
+function TenantTips() {
+  const tips = [
+    {
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        </svg>
+      ),
+      title: "Cập nhật hóa đơn đúng hạn",
+      body: "Đảm bảo thanh toán tiền phòng trước ngày quy định để tránh phát sinh phí trễ hạn.",
+      accent: "from-emerald-500 to-teal-600",
+    },
+    {
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      ),
+      title: "Liên hệ chủ trọ dễ dàng",
+      body: "Mọi thắc mắc về phòng, dịch vụ hay sửa chữa — gửi tin nhắn trực tiếp trong hệ thống.",
+      accent: "from-violet-500 to-purple-600",
+    },
+    {
+      icon: (
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+      ),
+      title: "Gia hạn hợp đồng sớm",
+      body: "Chủ động liên hệ trước ngày kết thúc 30 ngày để có nhiều lựa chọn gia hạn hơn.",
+      accent: "from-amber-500 to-orange-600",
+    },
+  ];
+
+  return (
+    <div className="mt-8">
+      <div className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-teal-600 mb-1.5">
+        Gợi ý cho bạn
+      </div>
+      <h2 className="text-xl font-bold text-slate-900 mb-5">Mẹo hữu ích</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {tips.map((t) => (
+          <div
+            key={t.title}
+            className="group relative bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-slate-300 transition-all duration-200 overflow-hidden"
+          >
+            <div
+              className={`absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-2xl bg-gradient-to-br ${t.accent} group-hover:opacity-20 transition`}
+            />
+            <div
+              className={`relative w-11 h-11 rounded-2xl flex items-center justify-center text-white bg-gradient-to-br ${t.accent} shadow-md mb-4`}
+            >
+              {t.icon}
+            </div>
+            <h3 className="relative text-[14.5px] font-bold text-slate-900 m-0 mb-1.5">
+              {t.title}
+            </h3>
+            <p className="relative text-[13px] text-slate-600 m-0 leading-relaxed">
+              {t.body}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -705,7 +863,7 @@ export default function DashboardPage() {
   if (state.kind === "error") return <CenterError message={state.message} />;
 
   return (
-    <div className="max-w-[1280px] mx-auto pb-12">
+    <div className="max-w-[1280px] mx-auto pb-12 space-y-8">
       <TenantHero
         user={{ fullName: user.fullName ?? "bạn" }}
         contract={state.kind === "rented" ? state.contract : null}
@@ -713,12 +871,16 @@ export default function DashboardPage() {
       {state.kind === "rented" ? (
         <>
           <TenantKpis contract={state.contract} />
-          <TenantRentedCard contract={state.contract} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <TenantRentedCard contract={state.contract} />
+            </div>
+            <TenantOverviewPanel contract={state.contract} />
+          </div>
+          <TenantTips />
         </>
       ) : (
-        <div className="bg-white border border-slate-200 rounded-2xl p-6">
-          <TenantBrowse rooms={state.rooms} />
-        </div>
+        <TenantBrowse rooms={state.rooms} />
       )}
     </div>
   );
