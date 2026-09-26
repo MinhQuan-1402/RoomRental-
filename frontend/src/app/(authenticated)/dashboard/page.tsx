@@ -344,7 +344,7 @@ function TenantHero({
         <div className="absolute top-1/2 right-1/3 w-40 h-40 rounded-full bg-teal-300/20 blur-2xl" />
       </div>
 
-      <div className="relative px-10 py-10 flex items-center gap-8 flex-wrap">
+      <div className="relative pl-14 pr-12 py-12 flex items-center gap-10 flex-wrap">
         <div className="w-20 h-20 rounded-3xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center text-white font-bold text-2xl shrink-0 shadow-2xl">
           {initials}
         </div>
@@ -370,17 +370,7 @@ function TenantHero({
                 Phòng {contract.room.roomNumber}
               </span>
             </div>
-          ) : (
-            <a
-              href="/rooms"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-white text-teal-700 rounded-2xl font-semibold text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 mt-4"
-            >
-              Xem tất cả phòng
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </a>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
