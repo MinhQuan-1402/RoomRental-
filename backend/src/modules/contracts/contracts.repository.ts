@@ -1,5 +1,4 @@
 import { prisma } from '../../config/prisma';
-import { MyActiveContract } from './contracts.types';
 
 export class ContractsRepository {
   /**
@@ -37,6 +36,65 @@ export class ContractsRepository {
         },
       },
       orderBy: { startDate: 'desc' },
+    });
+  }
+
+  /**
+   * Find a single contract by id with full landlord / tenant / room context.
+   * Used for ownership checks on file upload / download.
+   */
+  async findContractById(contractId: number) {
+    return prisma.contract.findUnique({
+      where: { id: contractId },
+      include: {
+        room: { select: { id: true, roomNumber: true } },
+        tenant: { select: { id: true, userId: true, fullName: true } },
+      },
+    });
+  }
+
+  /**
+   * Update the file metadata on a contract after a successful upload.
+   * Version is incremented atomically by the caller.
+   */
+  async updateContractFile(
+    contractId: number,
+    data: {
+      fileName: string;
+      fileMimeType: string;
+      fileSize: number;
+      fileVersion: number;
+      fileUploadedAt: Date;
+    }
+  ) {
+    return prisma.contract.update({
+      where: { id: contractId },
+      data,
+      select: {
+        id: true,
+        fileName: true,
+        fileMimeType: true,
+        fileSize: true,
+        fileVersion: true,
+        fileUploadedAt: true,
+      },
+    });
+  }
+
+  /**
+   * List all contracts owned by a landlord, with related room and tenant.
+   * Includes file metadata so the UI can show "has file / v1 / v2 ...".
+   */
+  async listContractsForLandlord(landlordId: number) {
+    return prisma.contract.findMany({
+      where: { landlordId },
+      orderBy: [{ status: "asc" }, { startDate: "desc" }],
+      include: {
+        room: { select: { id: true, roomNumber: true, address: true } },
+        tenant: {
+          select: { id: true, fullName: true, phone: true },
+        },
+      },
     });
   }
 }

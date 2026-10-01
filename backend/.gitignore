@@ -20,3 +20,9 @@ yarn-error.log*
 .vscode/
 .idea/
 Thumbs.db
+
+# Local file storage (contract PDFs uploaded by landlord)
+storage/
+!storage/.gitkeep
+!storage/contracts/.gitkeep
+!storage/contracts/_tmp/.gitkeep
