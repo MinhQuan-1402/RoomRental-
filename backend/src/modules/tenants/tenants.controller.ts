@@ -10,7 +10,7 @@ import {
 export const tenantsController = {
   async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const landlordId = req.user!.userId;
+      const landlordId = Number(req.user!.userId);
       const query = listTenantsQuerySchema.parse(req.query);
       const result = await tenantsService.list(landlordId, query);
       res.json({ success: true, data: result });
@@ -21,7 +21,7 @@ export const tenantsController = {
 
   async getOne(req: Request, res: Response, next: NextFunction) {
     try {
-      const landlordId = req.user!.userId;
+      const landlordId = Number(req.user!.userId);
       const { id } = tenantIdParamSchema.parse(req.params);
       const tenant = await tenantsService.getOne(landlordId, id);
       if (!tenant) {
@@ -38,7 +38,7 @@ export const tenantsController = {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const landlordId = req.user!.userId;
+      const landlordId = Number(req.user!.userId);
       const body = createTenantSchema.parse(req.body);
       const created = await tenantsService.create(landlordId, body);
       res.status(201).json({
@@ -53,7 +53,7 @@ export const tenantsController = {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const landlordId = req.user!.userId;
+      const landlordId = Number(req.user!.userId);
       const { id } = tenantIdParamSchema.parse(req.params);
       const body = updateTenantSchema.parse(req.body);
       const updated = await tenantsService.update(landlordId, id, body);
@@ -75,7 +75,7 @@ export const tenantsController = {
 
   async remove(req: Request, res: Response, next: NextFunction) {
     try {
-      const landlordId = req.user!.userId;
+      const landlordId = Number(req.user!.userId);
       const { id } = tenantIdParamSchema.parse(req.params);
       const result = await tenantsService.remove(landlordId, id);
       if (!result.ok) {

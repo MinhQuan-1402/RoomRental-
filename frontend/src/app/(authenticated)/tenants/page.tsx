@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import management from "@/components/landlord/Management.module.css";
 import {
   tenantsApi,
   type CreateTenantDto,
@@ -107,7 +108,7 @@ export default function TenantsPage() {
     return {
       total,
       active,
-      inactive: Math.max(total - active, 0),
+      inactive: tenants.length - active,
     };
   }, [tenants, total]);
 
@@ -117,59 +118,26 @@ export default function TenantsPage() {
   };
 
   return (
-    <div className="max-w-[1280px] mx-auto pb-12">
-      {/* ─── Hero gradient header ───────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl mb-6 bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800 shadow-lg">
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-white/30 blur-3xl" />
-          <div className="absolute -bottom-16 -left-8 w-72 h-72 rounded-full bg-emerald-300/40 blur-3xl" />
-        </div>
-        <div className="relative px-8 py-7 flex items-center justify-between gap-6 flex-wrap">
-          <div className="text-white">
-            <div className="flex items-center gap-2 text-teal-100 text-xs font-medium uppercase tracking-wider mb-1.5">
-              <IconUsers className="w-4 h-4" />
-              Quản lý
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight">Người thuê</h1>
-            <p className="text-teal-100/90 text-sm mt-1.5 max-w-md">
-              Theo dõi hồ sơ, thông tin liên lạc và tình trạng hợp đồng của tất cả người thuê.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setEditingTenant(null);
-              setModalOpen(true);
-            }}
-            className="group inline-flex items-center gap-2 px-5 py-3 bg-white text-teal-700 rounded-xl font-semibold text-sm shadow-md hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
-          >
-            <svg className="w-4 h-4 transition-transform group-hover:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Thêm người thuê
-          </button>
-        </div>
-      </div>
-
+    <div className={management.page}>
+<header className={management.hero}><div><p className={management.eyebrow}>HỒ SƠ & HỢP ĐỒNG</p><h1>Người thuê</h1><p>Quản lý thông tin liên lạc và theo dõi tình trạng thuê phòng.</p></div><button className={management.primary} onClick={() => { setEditingTenant(null); setModalOpen(true); }}>＋ Thêm người thuê</button></header>
       {/* ─── Stats cards ────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div className={management.summary}>
         <StatCard
-          label="Tổng hồ sơ"
+          label="Hồ sơ khớp bộ lọc"
           value={stats.total}
           tone="neutral"
           icon={<IconUsers className="w-5 h-5" />}
           accent="from-slate-500 to-slate-600"
         />
         <StatCard
-          label="Đang thuê"
+          label="Đang thuê trên trang"
           value={stats.active}
           tone="success"
           icon={<IconCheck className="w-5 h-5" />}
           accent="from-emerald-500 to-teal-600"
         />
         <StatCard
-          label="Chưa thuê"
+          label="Chưa thuê trên trang"
           value={stats.inactive}
           tone="warning"
           icon={<IconClock className="w-5 h-5" />}
@@ -180,7 +148,7 @@ export default function TenantsPage() {
       {/* ─── Toolbar ────────────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6">
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="relative flex-1 min-w-[260px]">
+          <div className="relative flex-1 min-w-0 basis-[240px]">
             <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -232,7 +200,7 @@ export default function TenantsPage() {
       )}
 
       {/* ─── Tenant grid ─────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+      <div className={management.list}>
         {loading && tenants.length === 0 ? (
           <SkeletonGrid />
         ) : tenants.length === 0 ? (
@@ -245,7 +213,7 @@ export default function TenantsPage() {
             }}
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className={management.grid}>
             {tenants.map((t) => (
               <TenantCard
                 key={t.id}
@@ -388,7 +356,7 @@ function TenantCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="group relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-0.5 hover:border-slate-300 transition-all duration-200 overflow-hidden">
+    <div className={management.tenantCard}>
       {/* Top accent stripe */}
       <div
         className={classNames(

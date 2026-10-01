@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api-client";
+import { TenantHero, TenantBrowse } from "@/components/tenant/TenantDashboard";
+import tenantStyles from "@/components/tenant/TenantDashboard.module.css";
+import LandlordOverview from "@/components/landlord/LandlordOverview";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface AvailableRoom {
@@ -85,298 +88,6 @@ const formatDate = (iso: string) => {
   });
 };
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
-function IconRoom({ size = 22 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <polyline points="9 22 9 12 15 12 15 22" />
-    </svg>
-  );
-}
-function IconKey({ size = 22 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="7.5" cy="15.5" r="5.5" />
-      <path d="m21 2-9.6 9.6" />
-      <path d="m15.5 7.5 3 3L22 7l-3-3" />
-    </svg>
-  );
-}
-function IconDoorOpen({ size = 22 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z" />
-      <circle cx="15" cy="12" r="1" />
-      <path d="M10 4v16" />
-    </svg>
-  );
-}
-function IconCoin({ size = 22 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M14.5 8.5h-3a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-3" />
-      <line x1="12" y1="7" x2="12" y2="17" />
-    </svg>
-  );
-}
-function IconWave() {
-  return (
-    <svg width="40" height="40" viewBox="0 0 80 80" fill="none">
-      <path d="M10 60 Q 25 30, 40 50 T 70 30" stroke="#fff" strokeWidth="2" opacity="0.25" fill="none" />
-    </svg>
-  );
-}
-
-// ─── Shared Card primitive (tái sử dụng cho tất cả cards) ────────────────────
-type CardTone = "teal" | "blue" | "purple" | "amber" | "rose" | "sky";
-
-const TONE_STYLES: Record<
-  CardTone,
-  { bg: string; text: string; iconBg: string; iconColor: string }
-> = {
-  teal: { bg: "#F0FDFA", text: "#0F766E", iconBg: "#CCFBF1", iconColor: "#0F766E" },
-  blue: { bg: "#EFF6FF", text: "#1D4ED8", iconBg: "#DBEAFE", iconColor: "#2563EB" },
-  purple: { bg: "#FAF5FF", text: "#7C3AED", iconBg: "#F3E8FF", iconColor: "#9333EA" },
-  amber: { bg: "#FFFBEB", text: "#B45309", iconBg: "#FEF3C7", iconColor: "#D97706" },
-  rose: { bg: "#FFF1F2", text: "#BE123C", iconBg: "#FFE4E6", iconColor: "#E11D48" },
-  sky: { bg: "#F0F9FF", text: "#0369A1", iconBg: "#E0F2FE", iconColor: "#0284C7" },
-};
-
-interface StatCardProps {
-  label: string;
-  value: string | number;
-  tone: CardTone;
-  icon: React.ReactNode;
-  delta?: { value: string; up: boolean };
-  sublabel?: string;
-  link?: { href: string; label: string };
-}
-
-const StatCard: React.FC<StatCardProps> = ({ label, value, tone, icon, delta, sublabel, link }) => {
-  const t = TONE_STYLES[tone];
-  return (
-    <div
-      className="relative overflow-hidden rounded-2xl border transition-all hover:shadow-md hover:-translate-y-0.5"
-      style={{
-        backgroundColor: "#FFFFFF",
-        borderColor: "var(--border-default)",
-        padding: "20px",
-        minHeight: 132,
-      }}
-    >
-      {/* Header row: label trái + icon phải (cùng hàng) */}
-      <div className="flex items-center justify-between mb-3">
-        <div
-          className="text-[13px] font-medium uppercase tracking-wider"
-          style={{ color: "var(--text-label)" }}
-        >
-          {label}
-        </div>
-        <div
-          className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-          style={{ backgroundColor: t.iconBg, color: t.iconColor }}
-        >
-          {icon}
-        </div>
-      </div>
-
-      {/* Big value */}
-      <div className="text-[28px] font-bold leading-none" style={{ color: "var(--text-heading)" }}>
-        {value}
-      </div>
-
-      {/* Optional delta chip */}
-      {delta && (
-        <div className="mt-2">
-          <span
-            className="inline-flex items-center gap-0.5 text-[11px] font-semibold px-2 py-0.5 rounded-full"
-            style={{
-              backgroundColor: delta.up ? "#D1FAE5" : "#FEE2E2",
-              color: delta.up ? "#047857" : "#B91C1C",
-            }}
-          >
-            {delta.up ? "▲" : "▼"} {delta.value}
-          </span>
-        </div>
-      )}
-
-      {(sublabel || link) && (
-        <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{ borderColor: "var(--border-subtle)" }}>
-          {sublabel && (
-            <span className="text-[11px]" style={{ color: "var(--text-label)" }}>
-              {sublabel}
-            </span>
-          )}
-          {link && (
-            <a
-              href={link.href}
-              className="text-[11px] font-semibold hover:underline"
-              style={{ color: t.text }}
-            >
-              {link.label} →
-            </a>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ─── Tenant-side: room card (browse empty rooms) ──────────────────────────────
-function TenantRoomCard({ room }: { room: AvailableRoom }) {
-  const img = room.images?.[0]?.url;
-  const placeholderHue = (() => {
-    // Hash đơn giản từ số phòng → tạo background pastel ổn định
-    let h = 0;
-    for (let i = 0; i < room.roomNumber.length; i++) {
-      h = (h * 31 + room.roomNumber.charCodeAt(i)) | 0;
-    }
-    return Math.abs(h) % 6;
-  })();
-  const hueBg = [
-    "from-teal-100 to-emerald-50",
-    "from-sky-100 to-blue-50",
-    "from-violet-100 to-purple-50",
-    "from-amber-100 to-orange-50",
-    "from-rose-100 to-pink-50",
-    "from-lime-100 to-green-50",
-  ][placeholderHue];
-
-  return (
-    <div className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 hover:border-slate-300 transition-all duration-200 flex flex-col">
-      {img ? (
-        <img
-          src={img}
-          alt={`Phòng ${room.roomNumber}`}
-          className="w-full h-52 object-cover block"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = "none";
-          }}
-        />
-      ) : (
-        <div
-          className={`w-full h-52 bg-gradient-to-br ${hueBg} flex items-center justify-center`}
-        >
-          <svg className="w-14 h-14 text-slate-400/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-          </svg>
-        </div>
-      )}
-      <div className="p-7 flex flex-col gap-3.5 flex-1">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="text-lg font-bold text-slate-900 m-0 leading-tight">
-            Phòng {room.roomNumber}
-          </h3>
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            Còn trống
-          </span>
-        </div>
-        <div className="flex items-start gap-1.5 text-[13px] text-slate-600">
-          <svg className="w-4 h-4 mt-0.5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>
-          <span className="leading-snug">{room.address}</span>
-        </div>
-        {room.description && (
-          <p className="text-[13px] text-slate-500 m-0 line-clamp-2 leading-relaxed">
-            {room.description}
-          </p>
-        )}
-        <div className="flex flex-wrap gap-1.5">
-          {room.area && (
-            <span className="text-xs font-medium px-2.5 py-1 rounded-md bg-slate-100 text-slate-700">
-              {room.area} m²
-            </span>
-          )}
-          {room.floor !== null && (
-            <span className="text-xs font-medium px-2.5 py-1 rounded-md bg-slate-100 text-slate-700">
-              Tầng {room.floor}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
-          <div>
-            <div className="text-[11px] text-slate-500 font-medium">
-              Giá thuê
-            </div>
-            <div className="text-xl font-bold text-teal-700 mt-1 leading-tight">
-              {VND(room.price)}
-              <span className="text-[12px] text-slate-500 ml-1 font-medium">/tháng</span>
-            </div>
-          </div>
-          <button className="inline-flex items-center gap-1.5 bg-teal-600 text-white text-[13px] font-semibold rounded-xl px-4 py-2.5 border-none hover:bg-teal-700 shadow-sm hover:shadow-md transition shrink-0">
-            Xem chi tiết
-            <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Tenant hero header ───────────────────────────────────────────────────────
-function TenantHero({
-  user,
-  contract,
-}: {
-  user: { fullName: string };
-  contract: MyActiveContract | null;
-}) {
-  const initials = (() => {
-    const parts = (user.fullName ?? "").trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return "?";
-    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-  })();
-
-  return (
-    <div className="relative overflow-hidden rounded-3xl mb-8 bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800 shadow-xl">
-      <div className="absolute inset-0 opacity-30 pointer-events-none">
-        <div className="absolute -top-16 -right-16 w-80 h-80 rounded-full bg-white/30 blur-3xl" />
-        <div className="absolute -bottom-20 -left-8 w-96 h-96 rounded-full bg-emerald-300/40 blur-3xl" />
-        <div className="absolute top-1/2 right-1/3 w-40 h-40 rounded-full bg-teal-300/20 blur-2xl" />
-      </div>
-
-      <div className="relative pl-14 pr-12 py-12 flex items-center gap-10 flex-wrap">
-        <div className="w-20 h-20 rounded-3xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center text-white font-bold text-2xl shrink-0 shadow-2xl">
-          {initials}
-        </div>
-        <div className="text-white flex-1 min-w-[280px]">
-          <div className="text-teal-100 text-[11px] font-semibold uppercase tracking-[0.12em] mb-2">
-            Tổng quan cá nhân
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight leading-tight">
-            Xin chào, {user.fullName} 👋
-          </h1>
-          <p className="text-teal-100/90 text-[14px] mt-2 max-w-xl leading-relaxed">
-            {contract
-              ? "Đây là thông tin phòng và hợp đồng bạn đang thuê. Cập nhật mọi thứ ngay tại đây."
-              : "Khám phá các phòng trống và tìm nơi ở phù hợp với bạn trong vài cú nhấp."}
-          </p>
-          {contract ? (
-            <div className="flex gap-2 flex-wrap mt-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm border border-white/25 text-white text-[12px] font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
-                Hợp đồng đang hiệu lực
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 text-teal-50 text-[12px] font-medium">
-                Phòng {contract.room.roomNumber}
-              </span>
-            </div>
-          ) : null}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── KPI 4 stats ──────────────────────────────────────────────────────────────
 function TenantKpis({ contract }: { contract: MyActiveContract }) {
   const startDate = new Date(contract.startDate);
@@ -412,7 +123,7 @@ function TenantKpis({ contract }: { contract: MyActiveContract }) {
     {
       label: "Tiền đặt cọc",
       value: VNDCompact(contract.deposit),
-      sub: "Đã ký quỹ",
+      sub: "Theo hợp đồng",
       accent: "from-violet-500 to-purple-600",
       icon: (
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -593,7 +304,7 @@ function TenantOverviewPanel({ contract }: { contract: MyActiveContract }) {
           Xem chi tiết hợp đồng
         </a>
         <a
-          href="/invoices"
+          href="/my-invoices"
           className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl text-[13px] font-semibold hover:bg-slate-50 hover:border-slate-300 transition"
         >
           Hóa đơn của tôi
@@ -696,62 +407,6 @@ function TenantInfoItem({ label, value }: { label: string; value: React.ReactNod
         {label}
       </div>
       <div className="text-[15px] font-semibold text-slate-900 leading-tight">{value}</div>
-    </div>
-  );
-}
-
-// ─── Browse empty rooms ───────────────────────────────────────────────────────
-function TenantBrowse({ rooms }: { rooms: AvailableRoom[] }) {
-  return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8">
-      <div className="mb-7 flex items-start justify-between gap-4 flex-wrap">
-        <div className="text-center flex-1 min-w-[260px]">
-          <h2 className="text-2xl font-bold text-slate-900 m-0 mb-1.5 tracking-tight">
-            Phòng trống hiện có
-          </h2>
-          <p className="text-sm text-slate-500 m-0 mx-auto max-w-xl leading-relaxed">
-            Danh sách phòng đang cho thuê — chọn phòng phù hợp để ký hợp đồng.
-          </p>
-        </div>
-        <a
-          href="/rooms"
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-600 hover:text-teal-700 hover:bg-teal-50 px-3.5 py-2 rounded-xl transition shrink-0"
-        >
-          Xem tất cả
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </a>
-      </div>
-
-      {rooms.length === 0 ? (
-        <div className="bg-gradient-to-br from-slate-50 to-slate-100/30 border-2 border-dashed border-slate-200 rounded-2xl py-16 px-6 flex flex-col items-center text-center">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center mb-4 shadow-inner">
-            <svg className="w-10 h-10 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9 22 9 12 15 12 15 22" />
-            </svg>
-          </div>
-          <h3 className="text-base font-semibold text-slate-700 mb-1.5">
-            Hiện chưa có phòng trống
-          </h3>
-          <p className="text-[13px] text-slate-500 mb-6 max-w-sm">
-            Vui lòng quay lại sau — chủ trọ đang cập nhật phòng mới.
-          </p>
-          <a
-            href="/contracts"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-teal-600 text-white rounded-xl text-[13px] font-semibold hover:bg-teal-700 shadow-sm hover:shadow-md transition"
-          >
-            Xem hợp đồng của tôi
-          </a>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-          {rooms.slice(0, 6).map((r) => (
-            <TenantRoomCard key={r.id} room={r} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
@@ -864,7 +519,7 @@ export default function DashboardPage() {
   if (state.kind === "error") return <CenterError message={state.message} />;
 
   return (
-    <div className="max-w-[1280px] mx-auto pb-12 space-y-12">
+    <div className={tenantStyles.page}>
       <TenantHero
         user={{ fullName: user.fullName ?? "bạn" }}
         contract={state.kind === "rented" ? state.contract : null}
@@ -893,20 +548,6 @@ export default function DashboardPage() {
 }
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
-const PageHeader: React.FC<{ title: string; subtitle: string; right?: React.ReactNode }> = ({
-  title,
-  subtitle,
-  right,
-}) => (
-  <div className="flex items-end justify-between flex-wrap gap-4 mb-7">
-    <div>
-      <h1 className="text-[26px] font-bold text-slate-900 m-0 mb-1 tracking-tight">{title}</h1>
-      <p className="text-[13px] text-slate-500 m-0">{subtitle}</p>
-    </div>
-    {right}
-  </div>
-);
-
 const CenterSpinner: React.FC<{ text: string }> = ({ text }) => (
   <div className="flex flex-col items-center gap-3 py-12">
     <div className="w-8 h-8 border-[3px] border-teal-100 border-t-teal-700 rounded-full animate-spin" />
@@ -944,181 +585,5 @@ function LandlordDashboard() {
   if (loading) return <CenterSpinner text="Đang tải thống kê..." />;
   if (error || !stats) return <CenterError message={error ?? "Không có dữ liệu"} />;
 
-  return (
-    <div className="w-full space-y-7">
-      {/* ─── Header với gradient background ──────────────────────────────── */}
-      <div
-        className="relative overflow-hidden rounded-2xl px-8 py-7"
-        style={{
-          background:
-            "linear-gradient(135deg, #F0FDFA 0%, #ECFEFF 50%, #FAF5FF 100%)",
-          border: "1px solid var(--border-default)",
-        }}
-      >
-        <div className="absolute -right-6 -bottom-6 opacity-50 pointer-events-none">
-          <IconWave />
-        </div>
-        <div className="relative">
-          <h1 className="text-[26px] font-bold text-slate-900 m-0 mb-1.5 tracking-tight">
-            Xin chào, {user?.fullName} 👋
-          </h1>
-          <p className="text-[14px] text-slate-600 m-0 max-w-2xl">
-            Chào mừng bạn quay lại! Đây là tổng quan hoạt động kinh doanh của bạn hôm nay.
-          </p>
-        </div>
-      </div>
-
-      {/* ─── 4 KPI Cards — full width, gap 24px ─────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-        <StatCard
-          label="Tổng số phòng"
-          value={stats.totalRooms}
-          tone="blue"
-          icon={<IconRoom />}
-          sublabel={`${stats.occupiedRooms} đang thuê · ${stats.maintenanceRooms} bảo trì`}
-          link={{ href: "/rooms", label: "Xem chi tiết" }}
-        />
-        <StatCard
-          label="Đang cho thuê"
-          value={stats.occupiedRooms}
-          tone="teal"
-          icon={<IconKey />}
-          sublabel={`${stats.activeContracts} hợp đồng hiệu lực`}
-          link={{ href: "/contracts", label: "Xem hợp đồng" }}
-        />
-        <StatCard
-          label="Phòng trống"
-          value={stats.availableRooms}
-          tone="purple"
-          icon={<IconDoorOpen />}
-          sublabel="Sẵn sàng cho thuê"
-          link={{ href: "/rooms?status=AVAILABLE", label: "Đăng tin" }}
-        />
-        <StatCard
-          label="Doanh thu dự kiến"
-          value={VNDCompact(stats.expectedRevenue)}
-          tone="amber"
-          icon={<IconCoin />}
-          sublabel={`Đã thu ${VNDCompact(stats.collectedRevenue)} tháng này`}
-          link={{ href: "/invoices", label: "Xem hóa đơn" }}
-        />
-      </div>
-
-      {/* ─── Sub-row: occupancy progress + financial status — 2 cols, gap 24 ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Occupancy */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h3 className="text-[16px] font-semibold text-slate-900 m-0">Tỷ lệ lấp đầy</h3>
-              <p className="text-[12px] text-slate-500 m-0 mt-0.5">So với tổng số phòng</p>
-            </div>
-            <span className="text-[28px] font-bold text-teal-700">{stats.occupancyRate}%</span>
-          </div>
-          <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden mb-5">
-            <div
-              className="h-full bg-gradient-to-r from-teal-500 to-teal-700 rounded-full transition-all duration-700"
-              style={{ width: `${stats.occupancyRate}%` }}
-            />
-          </div>
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <MiniStatus color="emerald" label="Đang thuê" value={stats.occupiedRooms} />
-            <MiniStatus color="sky" label="Còn trống" value={stats.availableRooms} />
-            <MiniStatus color="slate" label="Bảo trì" value={stats.maintenanceRooms} />
-          </div>
-        </div>
-
-        {/* Financial */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h3 className="text-[16px] font-semibold text-slate-900 m-0">Tình hình tài chính</h3>
-              <p className="text-[12px] text-slate-500 m-0 mt-0.5">
-                Tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}
-              </p>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <FinancialRow
-              tone="emerald"
-              label="Đã thu"
-              value={VND(stats.collectedRevenue)}
-              hint="Hóa đơn PAID trong tháng"
-            />
-            <FinancialRow
-              tone="amber"
-              label="Chờ thanh toán"
-              value={VND(stats.pendingInvoiceAmount)}
-              hint="Hóa đơn PENDING"
-            />
-            <FinancialRow
-              tone="rose"
-              label="Quá hạn"
-              value={VND(stats.overdueInvoiceAmount)}
-              hint="Hóa đơn OVERDUE"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <LandlordOverview name={user?.fullName ?? "bạn"} stats={stats} />;
 }
-
-// ─── Small primitives ─────────────────────────────────────────────────────────
-const MiniStatus: React.FC<{ color: "emerald" | "sky" | "slate"; label: string; value: number }> = ({
-  color,
-  label,
-  value,
-}) => {
-  const map = {
-    emerald: { bg: "#D1FAE5", text: "#047857" },
-    sky: { bg: "#E0F2FE", text: "#0369A1" },
-    slate: { bg: "#F1F5F9", text: "#475569" },
-  };
-  const c = map[color];
-  return (
-    <div className="rounded-lg p-2" style={{ backgroundColor: c.bg }}>
-      <div className="text-lg font-bold" style={{ color: c.text }}>
-        {value}
-      </div>
-      <div className="text-[10px] uppercase tracking-wider font-medium" style={{ color: c.text }}>
-        {label}
-      </div>
-    </div>
-  );
-};
-
-const FinancialRow: React.FC<{
-  tone: "emerald" | "amber" | "rose";
-  label: string;
-  value: string;
-  hint: string;
-}> = ({ tone, label, value, hint }) => {
-  const map = {
-    emerald: { bg: "#D1FAE5", text: "#047857" },
-    amber: { bg: "#FEF3C7", text: "#B45309" },
-    rose: { bg: "#FEE2E2", text: "#B91C1C" },
-  };
-  const c = map[tone];
-  return (
-    <div className="flex items-center justify-between gap-3 p-3 rounded-lg border" style={{ borderColor: "var(--border-subtle)" }}>
-      <div className="flex items-center gap-3 min-w-0">
-        <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-[16px] font-bold"
-          style={{ backgroundColor: c.bg, color: c.text }}
-        >
-          {tone === "emerald" ? "✓" : tone === "amber" ? "⏱" : "!"}
-        </div>
-        <div className="min-w-0">
-          <div className="text-[13px] font-semibold text-slate-900">{label}</div>
-          <div className="text-[11px] text-slate-500">{hint}</div>
-        </div>
-      </div>
-      <div className="text-right shrink-0">
-        <div className="text-[15px] font-bold" style={{ color: c.text }}>
-          {value}
-        </div>
-      </div>
-    </div>
-  );
-};

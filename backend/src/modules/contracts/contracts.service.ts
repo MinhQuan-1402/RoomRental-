@@ -10,10 +10,7 @@ export class ContractsService {
    * Returns null if the user has no tenant record or no active contract.
    */
   async getMyActiveContract(userId: number): Promise<MyActiveContract | null> {
-    const tenant = await this.repo.findTenantByUserId(userId);
-    if (!tenant) return null;
-
-    const contract = await this.repo.findActiveContractByTenantId(tenant.id);
+    const contract = await this.repo.findActiveContractByUserId(userId);
     if (!contract) return null;
 
     return {
@@ -29,7 +26,6 @@ export class ContractsService {
         ...contract.room,
         area: contract.room.area ? Number(contract.room.area) : null,
       },
-      property: contract.property,
       tenant: contract.tenant,
     };
   }

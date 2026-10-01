@@ -11,7 +11,6 @@ export class RoomsRepository {
       include: {
         images: {
           orderBy: { position: 'asc' },
-          take: 1,
           select: { url: true },
         },
       },

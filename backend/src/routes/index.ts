@@ -7,6 +7,7 @@ import { dashboardRouter } from '../modules/dashboard/dashboard.routes';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { authorizeRoles } from '../middlewares/role.middleware';
 import { env } from '../config/env';
+import { rentalRequestsRouter } from '../modules/rental-requests/rental-requests.routes';
 
 const router = Router();
 
@@ -35,6 +36,7 @@ router.use('/dashboard', dashboardRouter);
 
 // Tenants: landlord CRUD
 router.use('/tenants', tenantsRouter);
+router.use('/rental-requests', rentalRequestsRouter);
 
 // Dev-only route to verify LANDLORD role authorization works.
 if (env.NODE_ENV !== 'production') {

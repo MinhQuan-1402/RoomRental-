@@ -14,12 +14,8 @@ export interface MyActiveContract {
     floor: number | null;
     area: number | null;
     description: string | null;
-    status: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE';
-  };
-  property: {
-    id: number;
-    name: string;
     address: string;
+    status: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE';
   };
   tenant: {
     id: number;

@@ -112,7 +112,7 @@ export class RoomsService {
               }
             : undefined,
       },
-      include: { _count: { select: { images: true } } },
+      include: { images: { orderBy: { position: "asc" }, select: { url: true }, take: 1 }, _count: { select: { images: true } } },
     });
 
     return {
@@ -125,6 +125,7 @@ export class RoomsService {
       description: room.description,
       address: room.address,
       imageCount: room._count.images,
+      images: room.images,
     };
   }
 
@@ -204,7 +205,7 @@ export class RoomsService {
             ? { create: newImageRecords }
             : undefined,
       },
-      include: { _count: { select: { images: true } } },
+      include: { images: { orderBy: { position: "asc" }, select: { url: true }, take: 1 }, _count: { select: { images: true } } },
     });
 
     return {
@@ -217,6 +218,7 @@ export class RoomsService {
       description: updated.description,
       address: updated.address,
       imageCount: updated._count.images,
+      images: updated.images,
     };
   }
 

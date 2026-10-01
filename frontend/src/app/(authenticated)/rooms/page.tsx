@@ -10,7 +10,8 @@ import {
   UpdateRoomPayload,
   RoomStatus,
 } from "@/types/room";
-import { RoomsGrid, type RoomCardData } from "@/components/rooms/RoomsGrid";
+import ManagedRooms from "@/components/landlord/ManagedRooms";
+import management from "@/components/landlord/Management.module.css";
 
 const VND = (n: number) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(n);
@@ -33,50 +34,13 @@ export default function RoomsPage() {
 
   // Filters
   const [filterStatus, setFilterStatus] = useState<string>("");
+  const [search, setSearch] = useState("");
 
   // Modal state
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<RoomDetail | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<RoomListItem | null>(null);
   const [deleting, setDeleting] = useState(false);
-
-  /**
-   * Map RoomListItem (từ API) sang RoomCardData (cho card grid).
-   * Trong tương lai API sẽ trả về sẵn các trường mở rộng (tags, tenant, ...).
-   * Hiện tại ta bổ sung dữ liệu mở rộng dựa trên status để demo UI đẹp.
-   */
-  function enrichRoomForCard(r: RoomListItem): RoomCardData {
-    const base: RoomCardData = {
-      ...r,
-      buildingName: "Oakridge Heights",
-    };
-
-    if (r.status === "AVAILABLE") {
-      base.tags = [
-        { label: r.floor !== null ? `Tầng ${r.floor}` : "—" },
-        { label: r.area ? `${r.area} m²` : "—" },
-        { label: "Nội thất cơ bản" },
-      ];
-      base.utility = { icon: "zap", value: "—" };
-      base.primaryActionLabel = "Tạo hợp đồng";
-    } else if (r.status === "OCCUPIED") {
-      base.tenant = {
-        name: "Khách thuê",
-        phone: "—",
-        dueLabel: "—",
-        dueType: "warn",
-        contractEnd: "—",
-      };
-      base.primaryActionLabel = "Gửi nhắc phí";
-    } else if (r.status === "MAINTENANCE") {
-      base.maintenanceTasks = [
-        { label: "Bảo trì đang thực hiện", done: false },
-      ];
-      base.maintenanceProgress = 0;
-      base.primaryActionLabel = "Xem chi tiết";
-    }
-    return base;
-  }
 
   async function loadRooms() {
     setLoading(true);
@@ -124,16 +88,17 @@ export default function RoomsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterStatus]);
 
-  const hasFilters = !!filterStatus;
+  const hasFilters = !!filterStatus || !!search.trim();
+  const visibleRooms = rooms.filter(room => `${room.roomNumber} ${room.address}`.toLowerCase().includes(search.trim().toLowerCase()));
 
   return (
-    <div style={styles.root}>
-      <div style={styles.pageHeader}>
+    <div className={management.page}>
+      <div className={management.hero}>
         <div>
-          <h1 style={styles.title}>Phòng trọ</h1>
-          <p style={styles.subtitle}>Xem và quản lý các phòng cho thuê</p>
+          <p className={management.eyebrow}>DANH MỤC QUẢN LÝ</p><h1>Phòng trọ</h1>
+          <p>Xem và quản lý các phòng cho thuê</p>
         </div>
-        <button style={styles.primaryBtn} onClick={() => setCreating(true)}>
+        <button className={management.primary} onClick={() => setCreating(true)}>
           <IconPlus />
           Thêm phòng
         </button>
@@ -147,7 +112,7 @@ export default function RoomsPage() {
       )}
 
       {/* Filters */}
-      <div style={styles.filterBar}>
+      <div className={management.toolbar}><input className={management.search} aria-label="Tìm phòng theo số phòng hoặc địa chỉ" placeholder="Tìm số phòng, địa chỉ..." value={search} onChange={e => setSearch(e.target.value)} />
         <select
           style={styles.select}
           value={filterStatus}
@@ -162,41 +127,24 @@ export default function RoomsPage() {
         {hasFilters && (
           <button
             style={styles.clearBtn}
-            onClick={() => setFilterStatus("")}
+            onClick={() => { setFilterStatus(""); setSearch(""); }}
           >
             Xóa bộ lọc
           </button>
         )}
 
         <span style={styles.countText}>
-          {loading ? "Đang tải..." : `${rooms.length} phòng`}
+          {loading ? "Đang tải..." : `${visibleRooms.length} phòng`}
         </span>
       </div>
 
-      <div style={styles.card}>
+      <div>
         {loading ? (
           <LoadingState />
-        ) : rooms.length === 0 ? (
+        ) : visibleRooms.length === 0 ? (
           <EmptyState onCreate={() => setCreating(true)} hasFilters={hasFilters} />
         ) : (
-          <RoomsGrid
-            rooms={rooms.map(enrichRoomForCard)}
-            onPrimary={async (r) => {
-              if (r.status === "AVAILABLE") {
-                alert(`Tạo hợp đồng cho phòng ${r.roomNumber}`);
-              } else if (r.status === "OCCUPIED") {
-                alert(`Gửi nhắc phí cho phòng ${r.roomNumber}`);
-              } else {
-                const detail = await loadRoomDetail(r.id);
-                if (detail) setEditing(detail);
-              }
-            }}
-            onView={async (r) => {
-              const detail = await loadRoomDetail(r.id);
-              if (detail) setEditing(detail);
-            }}
-            onMore={(r) => setConfirmDelete(r)}
-          />
+<ManagedRooms rooms={visibleRooms} onEdit={async room => { const detail = await loadRoomDetail(room.id); if (detail) setEditing(detail); }} onDelete={setConfirmDelete} />
         )}
       </div>
 
@@ -259,49 +207,60 @@ function RoomFormModal({
   const [status, setStatus] = useState<RoomStatus>(initial?.status ?? "AVAILABLE");
   const [description, setDescription] = useState(initial?.description ?? "");
 
-  // Image state
-  const [previewUrls, setPreviewUrls] = useState<string[]>(
-    initial?.images.map((img) => img.url) ?? []
-  );
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
-  const [existingImageIds] = useState<number[]>(initial?.images.map((img) => img.id) ?? []);
-  const [imagesToDelete, setImagesToDelete] = useState<number[]>([]);
-  const [uploading, setUploading] = useState(false);
+  // Keep each image tied to its own identity, never to its position.
+  const [savedImages, setSavedImages] = useState(initial?.images ?? []);
+  const [pendingImages, setPendingImages] = useState<{ url: string; file: File }[]>([]);
+  const localUrls = useRef(new Set<string>());
+  const deleteInFlight = useRef(false);
   const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
-
   const [saving, setSaving] = useState(false);
   const [errMsg, setErrMsg] = useState<string | null>(null);
 
+  useEffect(() => {
+    const urls = localUrls.current;
+    return () => { urls.forEach(url => URL.revokeObjectURL(url)); urls.clear(); };
+  }, []);
+
+  const previews = [
+    ...savedImages.map(image => ({ url: image.url, id: image.id })),
+    ...pendingImages.map(image => ({ url: image.url, id: null })),
+  ];
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []);
-    const newPreviews = files.map((f) => URL.createObjectURL(f));
-    setPreviewUrls((prev) => [...prev, ...newPreviews]);
-    setPendingFiles((prev) => [...prev, ...files]);
+    const added = Array.from(e.target.files ?? []).map(file => {
+      const url = URL.createObjectURL(file);
+      localUrls.current.add(url);
+      return { url, file };
+    });
+    setPendingImages(previous => [...previous, ...added]);
+    e.target.value = "";
   }
 
-  function removePendingFile(idx: number) {
-    setPreviewUrls((prev) => prev.filter((_, i) => i !== idx));
-    setPendingFiles((prev) => prev.filter((_, i) => i !== idx));
+  function removePendingFile(url: string) {
+    setPendingImages(previous => previous.filter(image => image.url !== url));
+    URL.revokeObjectURL(url);
+    localUrls.current.delete(url);
   }
 
   async function handleDeleteImage(imageId: number) {
-    if (mode === "edit") {
-      setDeletingImageId(imageId);
-      try {
-        await apiRequest(`/rooms/${initial!.id}/images/${imageId}`, { method: "DELETE" });
-        setPreviewUrls((prev) => prev.filter((_, i) => initial!.images[i]?.id !== imageId));
-        setImagesToDelete((prev) => [...prev, imageId]);
-      } catch (err) {
-        const e = err as ApiError;
-        alert(`❌ ${e.message}`);
-      } finally {
-        setDeletingImageId(null);
-      }
+    if (mode !== "edit" || !initial || deleteInFlight.current || saving) return;
+    deleteInFlight.current = true;
+    setDeletingImageId(imageId);
+    setErrMsg(null);
+    try {
+      await apiRequest(`/rooms/${initial.id}/images/${imageId}`, { method: "DELETE" });
+      setSavedImages(previous => previous.filter(image => image.id !== imageId));
+    } catch (err) {
+      setErrMsg((err as ApiError).message ?? "Không thể xóa ảnh. Vui lòng thử lại.");
+    } finally {
+      deleteInFlight.current = false;
+      setDeletingImageId(null);
     }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (deleteInFlight.current || saving) return;
     setSaving(true);
     setErrMsg(null);
 
@@ -339,7 +298,7 @@ function RoomFormModal({
     }
 
     // Append new image files
-    pendingFiles.forEach((file) => formData.append("images", file));
+    pendingImages.forEach(({ file }) => formData.append("images", file));
 
     try {
       const url = mode === "create"
@@ -387,23 +346,19 @@ function RoomFormModal({
 
         <div style={styles.modalBody}>
           {/* Thumbnail preview row */}
-          {previewUrls.length > 0 && (
+          {previews.length > 0 && (
             <div style={styles.imageRow}>
-              {previewUrls.map((url, idx) => {
-                const isExisting = idx < (initial?.images.length ?? 0);
-                const imgId = isExisting ? initial!.images[idx]?.id : null;
-                // Existing Cloudinary URLs → use card thumbnail; new uploads → use local blob
-                const displayUrl = isExisting
-                  ? roomImageUrl(url, "thumbnail")
-                  : url;
+              {previews.map(({ url, id: imgId }) => {
+                const isExisting = imgId !== null;
+                const displayUrl = isExisting ? roomImageUrl(url, "thumbnail") : url;
                 return (
-                  <div key={url} style={styles.imageThumb}>
+                  <div key={imgId !== null ? `saved-${imgId}` : url} style={styles.imageThumb}>
                     <img src={displayUrl} alt="" style={styles.thumbImg} />
                     {isExisting && imgId ? (
                       <button
                         type="button"
                         style={styles.removeImgBtn}
-                        disabled={deletingImageId === imgId}
+                        disabled={deletingImageId !== null || saving}
                         onClick={() => handleDeleteImage(imgId)}
                         title="Xóa ảnh"
                       >
@@ -413,7 +368,7 @@ function RoomFormModal({
                       <button
                         type="button"
                         style={styles.removeImgBtn}
-                        onClick={() => removePendingFile(idx - (initial?.images.length ?? 0))}
+                        onClick={() => removePendingFile(url)}
                         title="Bỏ ảnh này"
                       >
                         <IconX />
@@ -441,7 +396,7 @@ function RoomFormModal({
               onClick={() => fileInputRef.current?.click()}
             >
               <IconCamera />
-              {previewUrls.length === 0 ? "Thêm ảnh phòng" : "Thêm ảnh khác"}
+              {previews.length === 0 ? "Thêm ảnh phòng" : "Thêm ảnh khác"}
             </button>
             <span style={styles.uploadHint}>JPEG, PNG, WebP, GIF — tối đa 5MB/ảnh, tối đa 10 ảnh</span>
           </div>
@@ -534,7 +489,7 @@ function RoomFormModal({
           <button type="button" style={styles.secondaryBtn} onClick={onClose} disabled={saving}>
             Hủy
           </button>
-          <button type="submit" style={styles.primaryBtn} disabled={saving}>
+          <button type="submit" style={styles.primaryBtn} disabled={saving || deletingImageId !== null}>
             {saving ? "Đang lưu..." : mode === "create" ? "Tạo phòng" : "Cập nhật"}
           </button>
         </div>

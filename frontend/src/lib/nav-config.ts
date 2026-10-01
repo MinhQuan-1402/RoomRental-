@@ -2,6 +2,7 @@
 
 export const LANDLORD_NAV = [
   { label: "Tổng quan", href: "/dashboard", icon: "dashboard" },
+  { label: "Yêu cầu thuê", href: "/rental-requests", icon: "file" },
   { label: "Phòng trọ", href: "/rooms", icon: "door" },
   { label: "Người thuê", href: "/tenants", icon: "users" },
   { label: "Hợp đồng", href: "/contracts", icon: "file" },
@@ -11,6 +12,7 @@ export const LANDLORD_NAV = [
 
 export const TENANT_NAV = [
   { label: "Tổng quan", href: "/dashboard", icon: "dashboard" },
+  { label: "Yêu cầu thuê", href: "/rental-requests", icon: "file" },
   { label: "Hợp đồng của tôi", href: "/my-contract", icon: "file" },
   { label: "Hóa đơn của tôi", href: "/my-invoices", icon: "invoice" },
 ] as const;

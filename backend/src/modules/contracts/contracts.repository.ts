@@ -17,9 +17,9 @@ export class ContractsRepository {
    * Find the most recent ACTIVE contract for a tenant.
    * "Most recent" so the UI always shows the contract they're currently bound to.
    */
-  async findActiveContractByTenantId(tenantId: number) {
+  async findActiveContractByUserId(userId: number) {
     return prisma.contract.findFirst({
-      where: { tenantId, status: 'ACTIVE' },
+      where: { tenant: { userId }, status: 'ACTIVE' },
       include: {
         room: {
           select: {
@@ -28,11 +28,9 @@ export class ContractsRepository {
             floor: true,
             area: true,
             description: true,
+            address: true,
             status: true,
           },
-        },
-        property: {
-          select: { id: true, name: true, address: true },
         },
         tenant: {
           select: { id: true, fullName: true, phone: true, email: true },

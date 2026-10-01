@@ -85,6 +85,8 @@ model User {
   contracts      Contract[]
   invoices       Invoice[]
   payments       Payment[]
+  rentalRequests RentalRequest[] @relation("Requester")
+  receivedRequests RentalRequest[] @relation("RequestLandlord")
 
   @@index([googleId])
   @@map("users")
@@ -108,6 +110,7 @@ model Room {
   images     RoomImage[]
   contracts  Contract[]
   invoices   Invoice[]
+  rentalRequests RentalRequest[]
 
   @@unique([landlordId, roomNumber], name: "uq_landlord_room_number")
   @@index([landlordId, status])
@@ -248,4 +251,31 @@ model Payment {
   @@index([landlordId, status])
   @@index([tenantId])
   @@map("payments")
+}
+
+enum RentalRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model RentalRequest {
+  id Int @id @default(autoincrement())
+  userId Int @map("user_id")
+  landlordId Int @map("landlord_id")
+  roomId Int @map("room_id")
+  phone String @db.VarChar(20)
+  rentPrice Decimal @map("rent_price") @db.Decimal(12, 2)
+  status RentalRequestStatus @default(PENDING)
+  contractId Int? @map("contract_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user User @relation("Requester", fields: [userId], references: [id], onDelete: Restrict)
+  landlord User @relation("RequestLandlord", fields: [landlordId], references: [id], onDelete: Restrict)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Restrict)
+  @@index([userId, status])
+  @@index([landlordId, status])
+  @@index([roomId, status])
+  @@map("rental_requests")
 }
