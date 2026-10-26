@@ -23,4 +23,25 @@ export interface MyActiveContract {
     phone: string;
     email: string | null;
   };
+
+  // ⭐ Contract file metadata — null if landlord hasn't uploaded any file yet
+  fileName: string | null;
+  fileMimeType: string | null;
+  fileSize: number | null;
+  fileVersion: number;
+  fileUploadedAt: Date | null;
+}
+
+/**
+ * Subset returned by GET /api/contracts/:id/file
+ * (just the file metadata, no full contract payload)
+ */
+export interface ContractFileInfo {
+  contractId: number;
+  fileName: string;
+  fileMimeType: string;
+  fileSize: number;
+  fileVersion: number;
+  fileUploadedAt: Date;
+  downloadUrl: string;
 }
