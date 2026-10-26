@@ -7,7 +7,14 @@ dotenv.config();
 const envSchema = z.object({
   PORT: z.coerce.number().default(5000),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  DATABASE_URL: z.string().url('DATABASE_URL must be a valid URL'),
+  // Accept any non-empty connection-string URL. Prisma's own engine validates
+  // the protocol at connect time, so we don't need to be strict here.
+  DATABASE_URL: z
+    .string()
+    .min(1, 'DATABASE_URL is required')
+    .refine((v) => v.includes('://'), {
+      message: 'DATABASE_URL must be a connection string (e.g. mysql://user:pass@host:port/db)',
+    }),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
 
   // Authentication secrets

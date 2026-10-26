@@ -11,7 +11,7 @@ export default function LandlordOverview({ name, stats }: { name: string; stats:
     { label: "Tổng số phòng", value: stats.totalRooms, hint: "Trong danh mục quản lý", href: "/rooms", icon: "rooms" },
     { label: "Đang cho thuê", value: stats.occupiedRooms, hint: `${stats.activeContracts} hợp đồng hiệu lực`, href: "/contracts", icon: "key" },
     { label: "Phòng còn trống", value: stats.availableRooms, hint: "Sẵn sàng đón người thuê", href: "/rooms", icon: "door" },
-    { label: "Tiền thuê dự kiến / tháng", value: money(stats.expectedRevenue), hint: "Theo giá các phòng đang thuê", href: "/invoices", icon: "money" },
+    { label: "Tiền thuê dự kiến / tháng", value: money(stats.expectedRevenue), hint: "Theo giá thuê trong hợp đồng hiện tại", href: "/invoices", icon: "money" },
   ];
   const statuses = [
     { label: "Đang thuê", count: stats.occupiedRooms, color: "#387c61" },

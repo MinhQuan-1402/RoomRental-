@@ -735,6 +735,55 @@ Các endpoint dạng danh sách (`GET`) hỗ trợ query params:
 
 ## 15. Module 7: Invoices APIs
 
+### Triển khai thực tế ngày 13/10/2026: hóa đơn hàng loạt cho chủ trọ
+
+Phần này mô tả API đã triển khai trên MySQL + Prisma. Các mục 15.1–15.5 bên dưới là thiết kế ban đầu; API tạo đơn lẻ, hủy và API cho người thuê trong các mục đó chưa được triển khai.
+
+Tất cả endpoint dưới đây yêu cầu Bearer token với vai trò `LANDLORD`, chỉ đọc/ghi tài nguyên của chủ trọ đăng nhập:
+
+- `GET /api/invoices/candidates?billingMonth=2026-10`: hợp đồng `ACTIVE` có thời gian thuê giao với tháng được chọn. Trả về phòng, người thuê, giá thuê hợp đồng, chỉ số đầu kỳ, đơn giá gợi ý, hạn thanh toán, `existingInvoice` và `blockedReason`.
+- `GET /api/invoices?billingMonth=2026-10`: danh sách hóa đơn của tháng, kèm toàn bộ thành phần tính tiền để xem chi tiết ngay trên giao diện.
+- `POST /api/invoices/bulk`: tạo tối đa 100 dòng mỗi request. Giao diện tự chia đợt nếu có nhiều hơn 100 phòng. HTTP 200 là đã xử lý đợt; cần đọc kết quả từng dòng để biết thành công/thất bại.
+
+Ví dụ payload tạo:
+
+```json
+{
+  "billingMonth": "2026-10",
+  "rows": [{
+    "contractId": 1,
+    "expectedRentPrice": 3000000,
+    "electricityPrevious": 100,
+    "electricityCurrent": 125,
+    "electricityUnitPrice": 3500,
+    "waterPrevious": 10,
+    "waterCurrent": 14,
+    "waterUnitPrice": 15000,
+    "serviceFee": 100000,
+    "otherFee": 0,
+    "otherFeeNote": "",
+    "dueDate": "2026-10-20"
+  }]
+}
+```
+
+Response `data` gồm `created`, `skipped`, `failed`, `results`. Mỗi kết quả có `rowIndex` (bắt đầu từ 0), `contractId`, `outcome` (`CREATED`, `SKIPPED`, `ERROR`), `code`, `message`; có thể có `fields`, `invoiceId`, `invoiceNumber`. Thiếu/sai dữ liệu một dòng không làm rollback các phòng đã tạo. Payload tháng sai hoặc không có dòng: HTTP 422; không đăng nhập: 401; sai vai trò: 403.
+
+Quy tắc hiện tại:
+
+- `@@unique([contractId, billingMonth])` chặn trùng kể cả gửi lại và tạo đồng thời. Hóa đơn `CANCELLED`/`DRAFT` vẫn chiếm kỳ đó; không tự động tạo bản thay thế.
+- Mỗi hóa đơn dùng transaction riêng, khóa hợp đồng thuộc chủ trọ bằng `SELECT ... FOR UPDATE`, kiểm tra lại trạng thái/ngày thuê, giá thuê, lịch sử chỉ số rồi tính tiền bằng `Prisma.Decimal`. Client không quyết định chủ trọ, phòng, người thuê, tổng tiền hay trạng thái.
+- Lần đầu nhập chỉ số cũ thực tế, không mặc định bằng 0. Những tháng sau chỉ được tạo tháng nối tiếp hóa đơn gần nhất đã phát hành; chỉ số cũ phải khớp chỉ số cuối trước đó. Không tự tạo lùi/chèn tháng để tránh làm sai chuỗi chỉ số. Thay công tơ/chỉ số giảm cần luồng điều chỉnh riêng, hiện chưa hỗ trợ.
+- Điện/nước dùng chỉ số nguyên không âm theo schema hiện tại. Đơn giá và các khoản phí không âm, tối đa 2 chữ số thập phân. Phí khác lớn hơn 0 phải có lý do.
+- Tiền phòng lấy từ `Contract.rentPrice`, thu đủ tháng, chưa chia theo ngày cho tháng đầu/cuối. Giao diện đánh dấu hợp đồng thuê một phần tháng.
+- Hạn thanh toán mặc định theo `billingDay` trong tháng, không trước ngày bắt đầu hợp đồng; chủ trọ có thể sửa cho từng dòng. `OVERDUE` khi hạn thanh toán trước ngày hiện tại tại Việt Nam, `PENDING` khi chưa quá hạn.
+- Chưa có `Property` trong schema/backend hiện tại nên giao diện lọc theo `Room.address`. Đổi tháng/bộ lọc và tải lại trạng thái giữ dữ liệu nhập trong phiên màn hình; tải lại toàn bộ trang sẽ mất dữ liệu chưa tạo.
+- Tạo hóa đơn làm tăng công nợ; không ghi nhận thanh toán, không tăng doanh thu đã thu, không thay đổi hợp đồng/phòng. Dashboard tính tiền thuê dự kiến theo giá hợp đồng hiện tại và công nợ quá hạn theo ngày đến hạn.
+
+Migration `20261013090000_unique_invoice_period` chỉ thêm ràng buộc, không xóa hóa đơn cũ. Nếu dữ liệu cũ có trùng, migration sẽ thất bại để giữ dữ liệu, cần đối soát trước khi triển khai. Sau khi dừng backend, chạy trong `backend`: `npx prisma migrate deploy` rồi `npx prisma generate` (Windows có thể khóa DLL khi backend đang chạy).
+
+Kiểm chứng: `npm run test:invoices` và `npm run test:invoices:integration` trong backend; integration chỉ chạy trên MySQL local và tự xóa các fixture của chính lần chạy. Cần cài dependency cả backend/frontend để kiểm tra helper nhập liệu. Build frontend bằng `npm run build`.
+
 ### 15.1. Lập hóa đơn hàng tháng (Create Monthly Invoice)
 * **Method & Endpoint:** `POST /api/invoices`
 * **Auth Requirement:** Authenticated
@@ -1068,3 +1117,21 @@ Các endpoint dạng danh sách (`GET`) hỗ trợ query params:
 * Trò chuyện thời gian thực (`Socket.IO Chat`).
 * AI Agent & Tool Calling (Sẽ triển khai sau khi Core API hoàn thiện).
 * Ký hợp đồng điện tử pháp lý (E-signature).
+
+## 21. Tenant invoices — implemented (2026-10-25)
+
+These endpoints reflect the current Express/Prisma implementation. Both require a Bearer access token with role `TENANT`.
+
+### GET /api/invoices/my
+
+Optional query parameters: `billingMonth` (`YYYY-MM`, 2000–2100), `status` (`PENDING`, `OVERDUE`, `PAID`, `CANCELLED`), `page` (default 1), `limit` (default 12, maximum 50).
+
+Returns the standard success envelope with `data.items`, `data.pagination` (`page`, `limit`, `total`, `totalPages`), `data.months` (available billing months, newest first), and `data.summary` (`outstandingAmount`, `outstandingCount`, `overdueAmount`, `overdueCount`). Items are ordered by billing month descending, then ID descending. Summary and available months always cover all of the tenant's published invoices, independently of list filters and pagination. Overdue debt is included in outstanding debt, not added to it.
+
+### GET /api/invoices/my/:id
+
+Returns one owned invoice, including room number/address, tenant name, billing month, contract ID, rent, electricity/water readings and unit prices, usage, line totals, service/other fees and fee note, total amount, due date, paid date and effective status.
+
+Ownership is determined only by `Invoice.tenant.userId === req.user.userId`, across all linked tenant profiles and historical contracts. Email matching and caller-provided tenant/user IDs do not grant access. Draft invoices are hidden. Missing, foreign and draft invoices all return 404 `INVOICE_NOT_FOUND`. Invalid filters or IDs return 422; missing authentication returns 401; other roles receive 403. Effective overdue status uses the Vietnam business date; an unpaid invoice due today is still `PENDING`.
+
+UI: `/my-invoices` and `/my-invoices/:id`. This release provides invoice viewing only; payment submission and confirmation are separate work.

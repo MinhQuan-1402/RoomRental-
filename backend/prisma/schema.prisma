@@ -229,7 +229,7 @@ model Invoice {
   landlord User      @relation(fields: [landlordId], references: [id], onDelete: Restrict)
   payments Payment[]
 
-  @@index([contractId, billingMonth])
+  @@unique([contractId, billingMonth])
   @@index([landlordId, status])
   @@index([tenantId, status])
   @@index([roomId])

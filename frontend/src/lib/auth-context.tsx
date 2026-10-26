@@ -29,7 +29,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (data: { user: AuthUser; tokens: AuthTokens }) => void;
+  login: (data: { user: AuthUser; tokens: AuthTokens }, remember?: boolean) => void;
   logout: () => Promise<void>;
   getToken: () => string | null;
 }

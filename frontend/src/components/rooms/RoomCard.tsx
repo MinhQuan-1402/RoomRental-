@@ -39,7 +39,8 @@ export type RoomStatusExt =
   | "LEAVING_SOON"
   | "MAINTENANCE";
 
-export interface RoomCardData extends RoomListItem {
+export interface RoomCardData extends Omit<RoomListItem, 'status'> {
+  status: RoomStatusExt;
   buildingName?: string;
   tags?: RoomTag[];
   utility?: RoomUtility;

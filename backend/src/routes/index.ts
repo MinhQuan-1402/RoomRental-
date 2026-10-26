@@ -8,6 +8,7 @@ import { authMiddleware } from '../middlewares/auth.middleware';
 import { authorizeRoles } from '../middlewares/role.middleware';
 import { env } from '../config/env';
 import { rentalRequestsRouter } from '../modules/rental-requests/rental-requests.routes';
+import { invoicesRouter } from '../modules/invoices/invoices.routes';
 
 const router = Router();
 
@@ -37,6 +38,7 @@ router.use('/dashboard', dashboardRouter);
 // Tenants: landlord CRUD
 router.use('/tenants', tenantsRouter);
 router.use('/rental-requests', rentalRequestsRouter);
+router.use('/invoices', invoicesRouter);
 
 // Dev-only route to verify LANDLORD role authorization works.
 if (env.NODE_ENV !== 'production') {
@@ -70,7 +72,6 @@ if (env.NODE_ENV !== 'production') {
 // router.use('/rooms', roomRoutes);
 // router.use('/tenants', tenantRoutes);
 // router.use('/contracts', contractRoutes);
-// router.use('/invoices', invoiceRoutes);
 // router.use('/payments', paymentRoutes);
 // router.use('/dashboard', dashboardRoutes);
 

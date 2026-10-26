@@ -1,4 +1,5 @@
 import { prisma } from '../../config/prisma';
+import { billingToday } from '../../utils/billing-date';
 
 export interface DashboardStats {
   totalRooms: number;
@@ -48,14 +49,13 @@ export class DashboardService {
     const maintenanceRooms = roomGroups.find((g) => g.status === 'MAINTENANCE')?._count._all ?? 0;
     const occupancyRate = totalRooms === 0 ? 0 : Math.round((occupiedRooms / totalRooms) * 100);
 
-    // 2. Expected revenue (landlord's rooms × rent price)
-    const allRooms = await prisma.room.findMany({
-      where: { landlordId },
-      select: { status: true, price: true },
+    // Use agreed contract rent, the same source as invoices (room listing prices can change).
+    const today = billingToday();
+    const rent = await prisma.contract.aggregate({
+      where: { landlordId, status: 'ACTIVE', startDate: { lte: today }, endDate: { gte: today } },
+      _sum: { rentPrice: true },
     });
-    const expectedRevenue = allRooms
-      .filter((r) => r.status === 'OCCUPIED')
-      .reduce((s, r) => s + Number(r.price), 0);
+    const expectedRevenue = Number(rent._sum.rentPrice ?? 0);
 
     // 3. Current month collected & pending revenue
     const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -87,7 +87,8 @@ export class DashboardService {
       prisma.invoice.aggregate({
         where: {
           landlordId,
-          status: 'OVERDUE',
+          status: { in: ['PENDING', 'OVERDUE'] },
+          dueDate: { lt: billingToday() },
         },
         _sum: { totalAmount: true },
       }),

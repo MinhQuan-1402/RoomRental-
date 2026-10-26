@@ -2,6 +2,7 @@
 
 import React from "react";
 import { RoomCard, type RoomCardData, type RoomStatusExt } from "./RoomCard";
+export type { RoomCardData } from './RoomCard';
 
 // ─── Mock data (sau này sẽ thay bằng API thật) ─────────────────────────────────
 export const MOCK_ROOMS: RoomCardData[] = [
