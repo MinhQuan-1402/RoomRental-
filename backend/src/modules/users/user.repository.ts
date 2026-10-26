@@ -3,6 +3,10 @@ import { prisma } from '../../config/prisma';
 import { CreateUserData } from './user.types';
 
 export class UserRepository {
+  async updateAvatar(userId: number, avatarUrl: string): Promise<User> {
+    return prisma.user.update({ where: { id: userId }, data: { avatarUrl } });
+  }
+
   /**
    * Find a user by unique filter (id, email, or googleId)
    */

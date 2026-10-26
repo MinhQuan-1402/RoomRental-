@@ -12,12 +12,16 @@ import React, {
 export type UserRole = "LANDLORD" | "TENANT";
 
 export interface AuthUser {
-  id: string;
+  id: string | number;
   email: string;
   fullName: string;
-  phone?: string;
+  phone?: string | null;
   role: UserRole;
   createdAt: string;
+  updatedAt?: string;
+  avatarUrl?: string | null;
+  authProvider?: "LOCAL" | "GOOGLE";
+  isActive?: boolean;
 }
 
 interface AuthTokens {
@@ -32,6 +36,7 @@ interface AuthContextValue {
   login: (data: { user: AuthUser; tokens: AuthTokens }, remember?: boolean) => void;
   logout: () => Promise<void>;
   getToken: () => string | null;
+  updateUser: (user: AuthUser) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -176,10 +181,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const getToken = useCallback(() => getAccessToken(), []);
+  const updateUser = useCallback((updated: AuthUser) => {
+    setUser(current => current && String(current.id) === String(updated.id) ? updated : current);
+  }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, isAuthenticated: !!user, login, logout, getToken }}
+      value={{ user, isLoading, isAuthenticated: !!user, login, logout, getToken, updateUser }}
     >
       {children}
     </AuthContext.Provider>

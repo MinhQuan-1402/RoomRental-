@@ -8,9 +8,18 @@ import {
 } from './auth.validation';
 import { sendSuccess } from '../../utils/response';
 import { AppError } from '../../utils/app-error';
+import { avatarService } from './avatar.service';
 
 export class AuthController {
   constructor(private service: AuthService = authService) {}
+
+  uploadAvatar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user) throw new AppError('Vui lòng đăng nhập để tiếp tục', 401, 'UNAUTHORIZED');
+      const user = await avatarService.upload(req.user.userId, req.file);
+      sendSuccess({ res, message: 'Cập nhật ảnh đại diện thành công', data: this.service.toUserResponse(user) });
+    } catch (error) { next(error); }
+  };
 
   register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

@@ -174,7 +174,7 @@ export class AuthService {
         user = await this.userRepo.linkGoogleAccount(
           existingByEmail.id,
           profile.googleId,
-          profile.avatarUrl,
+          existingByEmail.avatarUrl ?? profile.avatarUrl,
         );
       }
     }

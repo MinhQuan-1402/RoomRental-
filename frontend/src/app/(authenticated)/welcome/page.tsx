@@ -3,12 +3,12 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-// Redirect /welcome → /dashboard
+// Preserve the previous account link for existing bookmarks.
 export default function WelcomeRedirect() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/dashboard");
+    router.replace("/profile");
   }, [router]);
 
   return null;

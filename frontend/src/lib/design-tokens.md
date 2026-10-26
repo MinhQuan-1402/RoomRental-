@@ -150,3 +150,12 @@ typeScale.caption.lineHeight    = 1.4
 - Logo / brand mark: dùng `var(--brand-primary)` cho shape, không phải đen
 - Tránh dùng blue (#2563EB) hoặc indigo — đã thay bằng teal
 */
+
+## Giao diện v0 (khu vực đã đăng nhập)
+
+Các biến màu được ghi đè trong `AuthenticatedLayout.module.css`, nằm trong phạm vi layout đã đăng nhập. Đăng nhập và đăng ký tiếp tục dùng bộ token gốc.
+
+- Canvas: `#f4f2ee`; ink: `#13141f`; violet: `#503ee8`; lime: `#cef44a`; coral: `#fa7051`.
+- Font: Be Vietnam Pro, dự phòng Inter và sans-serif.
+- Violet là màu hành động chính; lime dùng cho điều hướng đang chọn và thao tác nổi bật; màu trạng thái thành công/cảnh báo/lỗi giữ ý nghĩa nghiệp vụ.
+- Dashboard và danh sách phòng dùng CSS Modules; dữ liệu lấy từ API hiện có, không dùng dữ liệu mẫu của bản v0.

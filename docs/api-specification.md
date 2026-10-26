@@ -1135,3 +1135,14 @@ Returns one owned invoice, including room number/address, tenant name, billing m
 Ownership is determined only by `Invoice.tenant.userId === req.user.userId`, across all linked tenant profiles and historical contracts. Email matching and caller-provided tenant/user IDs do not grant access. Draft invoices are hidden. Missing, foreign and draft invoices all return 404 `INVOICE_NOT_FOUND`. Invalid filters or IDs return 422; missing authentication returns 401; other roles receive 403. Effective overdue status uses the Vietnam business date; an unpaid invoice due today is still `PENDING`.
 
 UI: `/my-invoices` and `/my-invoices/:id`. This release provides invoice viewing only; payment submission and confirmation are separate work.
+## Ảnh đại diện tài khoản
+
+`POST /api/auth/me/avatar` — yêu cầu Bearer token; dành cho người dùng đã đăng nhập.
+
+- Body: `multipart/form-data`, duy nhất một file trong trường `avatar`.
+- Định dạng: JPEG, PNG hoặc WebP; tối đa 5 MB. Backend kiểm tra MIME và chữ ký file; Cloudinary xử lý ảnh thành WebP vuông 512 × 512.
+- Tài khoản được cập nhật lấy từ token đăng nhập; không nhận ID người dùng trong body.
+- Thành công: `200`, envelope `{ success, message, data }`; `data` là thông tin tài khoản hiện tại cùng `avatarUrl` mới, không bao gồm mật khẩu hoặc token.
+- Lỗi: `400` khi thiếu/sai file, `401` khi chưa đăng nhập, `403` khi tài khoản bị vô hiệu hóa, `413` khi quá 5 MB, `502` khi không tải/xử lý được ảnh.
+- Khi upload hoặc lưu tài khoản thất bại, ảnh đại diện trước đó được giữ lại. Ảnh cũ do tính năng này tạo được dọn sau khi lưu thành công; không xóa ảnh Google hoặc ảnh của tài khoản khác.
+- Frontend cung cấp chọn ảnh, xem trước, lưu/hủy; sau khi lưu sẽ đồng bộ ảnh hồ sơ và header từ phản hồi API. `GET /api/auth/me` trả lại ảnh đã lưu sau khi tải lại trang.

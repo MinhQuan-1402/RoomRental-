@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { apiRequest, ApiError } from "@/lib/api";
+import { getAccessToken } from "@/lib/auth-context";
 import { roomImageUrl, ROOM_IMAGE_PRESETS } from "@/lib/cloudinary";
 import {
   RoomListItem,
@@ -12,6 +13,7 @@ import {
 } from "@/types/room";
 import ManagedRooms from "@/components/landlord/ManagedRooms";
 import management from "@/components/landlord/Management.module.css";
+import AppIcon from "@/components/ui/AppIcon";
 
 const VND = (n: number) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(n);
@@ -35,6 +37,8 @@ export default function RoomsPage() {
   // Filters
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [search, setSearch] = useState("");
+  const [filterAddress, setFilterAddress] = useState("");
+  const [view, setView] = useState<"grid" | "list">("grid");
 
   // Modal state
   const [creating, setCreating] = useState(false);
@@ -46,9 +50,7 @@ export default function RoomsPage() {
     setLoading(true);
     setError(null);
     try {
-      const qs = new URLSearchParams();
-      if (filterStatus) qs.set("status", filterStatus);
-      const data = await apiRequest<RoomListItem[]>(`/rooms?${qs.toString()}`);
+      const data = await apiRequest<RoomListItem[]>("/rooms");
       setRooms(data);
     } catch (err) {
       const e = err as ApiError;
@@ -86,17 +88,30 @@ export default function RoomsPage() {
   useEffect(() => {
     loadRooms();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterStatus]);
+    if (new URLSearchParams(window.location.search).get("create") === "1") {
+      setCreating(true);
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, []);
 
-  const hasFilters = !!filterStatus || !!search.trim();
-  const visibleRooms = rooms.filter(room => `${room.roomNumber} ${room.address}`.toLowerCase().includes(search.trim().toLowerCase()));
+  const hasFilters = !!filterStatus || !!search.trim() || !!filterAddress;
+  const addresses = [...new Set(rooms.map(room => room.address).filter(Boolean))];
+  const scopedRooms = filterAddress ? rooms.filter(room => room.address === filterAddress) : rooms;
+  const visibleRooms = scopedRooms.filter(room => (!filterStatus || room.status === filterStatus) && `${room.roomNumber} ${room.address}`.toLowerCase().includes(search.trim().toLowerCase()));
+  const occupied = rooms.filter(room => room.status === "OCCUPIED").length;
+  const roomStats = [
+    { label: "Tỷ lệ lấp đầy", value: `${rooms.length ? Math.round(occupied / rooms.length * 100) : 0}%`, hint: `${occupied} phòng đang cho thuê`, tone: management.purple, icon: "key" as const },
+    { label: "Còn trống", value: String(rooms.filter(room => room.status === "AVAILABLE").length), hint: "Sẵn sàng cho thuê", tone: management.lime, icon: "door" as const },
+    { label: "Bảo trì", value: String(rooms.filter(room => room.status === "MAINTENANCE").length), hint: "Tạm ngưng cho thuê", tone: management.coral, icon: "building" as const },
+    { label: "Tổng số phòng", value: String(rooms.length), hint: `${addresses.length} địa chỉ đang quản lý`, tone: management.ink, icon: "home" as const },
+  ];
 
   return (
     <div className={management.page}>
       <div className={management.hero}>
         <div>
-          <p className={management.eyebrow}>DANH MỤC QUẢN LÝ</p><h1>Phòng trọ</h1>
-          <p>Xem và quản lý các phòng cho thuê</p>
+          <p className={management.eyebrow}>KHÔNG GIAN QUẢN LÝ</p><h1>Phòng trọ</h1>
+          <p>Quản lý phòng, cập nhật thông tin và theo dõi tình trạng cho thuê.</p>
         </div>
         <button className={management.primary} onClick={() => setCreating(true)}>
           <IconPlus />
@@ -111,32 +126,20 @@ export default function RoomsPage() {
         </div>
       )}
 
-      {/* Filters */}
-      <div className={management.toolbar}><input className={management.search} aria-label="Tìm phòng theo số phòng hoặc địa chỉ" placeholder="Tìm số phòng, địa chỉ..." value={search} onChange={e => setSearch(e.target.value)} />
-        <select
-          style={styles.select}
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
-          <option value="">Tất cả trạng thái</option>
-          <option value="AVAILABLE">Còn trống</option>
-          <option value="OCCUPIED">Đang thuê</option>
-          <option value="MAINTENANCE">Bảo trì</option>
-        </select>
-
-        {hasFilters && (
-          <button
-            style={styles.clearBtn}
-            onClick={() => { setFilterStatus(""); setSearch(""); }}
-          >
-            Xóa bộ lọc
-          </button>
-        )}
-
-        <span style={styles.countText}>
-          {loading ? "Đang tải..." : `${visibleRooms.length} phòng`}
-        </span>
+      <section className={management.roomStats} aria-label="Thống kê phòng">
+        {roomStats.map(stat => <div key={stat.label} className={stat.tone}><div><span>{stat.label}</span><AppIcon name={stat.icon} size={19}/></div><strong>{loading ? "—" : stat.value}</strong><small>{loading ? "Đang tải dữ liệu" : stat.hint}</small></div>)}
+      </section>
+      <div className={management.toolbar}>
+        <div className={management.tabs} role="group" aria-label="Lọc theo trạng thái">
+          {([{ value: "", label: "Tất cả" }, { value: "OCCUPIED", label: "Đang thuê" }, { value: "AVAILABLE", label: "Còn trống" }, { value: "MAINTENANCE", label: "Bảo trì" }]).map(item => <button key={item.value} aria-pressed={filterStatus === item.value} onClick={() => setFilterStatus(item.value)}>{item.label}<span>{item.value ? scopedRooms.filter(room => room.status === item.value).length : scopedRooms.length}</span></button>)}
+        </div>
+        <div className={management.filterControls}>
+          <label className={management.searchField}><AppIcon name="search" size={17}/><input className={management.search} aria-label="Tìm phòng theo số phòng hoặc địa chỉ" placeholder="Số phòng, địa chỉ..." value={search} onChange={e => setSearch(e.target.value)} /></label>
+          <select className={management.addressSelect} aria-label="Lọc theo địa chỉ" value={filterAddress} onChange={e => setFilterAddress(e.target.value)}><option value="">Tất cả địa chỉ</option>{addresses.map(address => <option key={address} value={address}>{address}</option>)}</select>
+          <div className={management.viewSwitch} role="group" aria-label="Chế độ hiển thị"><button aria-label="Dạng lưới" aria-pressed={view === "grid"} onClick={() => setView("grid")}><AppIcon name="grid" size={17}/></button><button aria-label="Dạng bảng" aria-pressed={view === "list"} onClick={() => setView("list")}><AppIcon name="list" size={18}/></button></div>
+        </div>
       </div>
+      <div className={management.resultBar}><p role="status">{loading ? "Đang tải danh sách..." : `Hiển thị ${visibleRooms.length} / ${rooms.length} phòng`}</p>{hasFilters && <button onClick={() => { setFilterStatus(""); setFilterAddress(""); setSearch(""); }}>Xóa bộ lọc</button>}</div>
 
       <div>
         {loading ? (
@@ -144,7 +147,7 @@ export default function RoomsPage() {
         ) : visibleRooms.length === 0 ? (
           <EmptyState onCreate={() => setCreating(true)} hasFilters={hasFilters} />
         ) : (
-<ManagedRooms rooms={visibleRooms} onEdit={async room => { const detail = await loadRoomDetail(room.id); if (detail) setEditing(detail); }} onDelete={setConfirmDelete} />
+<ManagedRooms rooms={visibleRooms} view={view} onEdit={async room => { const detail = await loadRoomDetail(room.id); if (detail) setEditing(detail); }} onDelete={setConfirmDelete} />
         )}
       </div>
 
@@ -214,6 +217,7 @@ function RoomFormModal({
   const deleteInFlight = useRef(false);
   const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
+  const dialogRef = useDialogFocus<HTMLFormElement>(onClose, saving);
   const [errMsg, setErrMsg] = useState<string | null>(null);
 
   useEffect(() => {
@@ -309,7 +313,7 @@ function RoomFormModal({
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api"}${url}`, {
         method,
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("accessToken") ?? ""}`,
+          Authorization: `Bearer ${getAccessToken() ?? ""}`,
         },
         body: formData,
       });
@@ -328,18 +332,23 @@ function RoomFormModal({
   }
 
   return (
-    <div style={styles.overlay} onClick={onClose}>
+    <div style={styles.overlay} onClick={() => { if (!saving) onClose(); }}>
       <form
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="room-form-title"
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         onSubmit={handleSubmit}
         style={styles.modal}
         encType="multipart/form-data"
       >
         <div style={styles.modalHeader}>
-          <h3 style={styles.modalTitle}>
+          <h3 id="room-form-title" style={styles.modalTitle}>
             {mode === "create" ? "Thêm phòng mới" : `Chỉnh sửa phòng ${initial?.roomNumber ?? ""}`}
           </h3>
-          <button type="button" style={styles.modalClose} onClick={onClose}>
+          <button type="button" style={styles.modalClose} onClick={onClose} disabled={saving} aria-label="Đóng biểu mẫu phòng">
             <IconX />
           </button>
         </div>
@@ -482,7 +491,7 @@ function RoomFormModal({
             />
           </Field>
 
-          {errMsg && <div style={styles.modalError}>⚠️ {errMsg}</div>}
+          {errMsg && <div role="alert" style={styles.modalError}>⚠️ {errMsg}</div>}
         </div>
 
         <div style={styles.modalFooter}>
@@ -505,14 +514,14 @@ function Field({
   label: string; required?: boolean; hint?: string; children: React.ReactNode;
 }) {
   return (
-    <div style={styles.field}>
-      <label style={styles.label}>
+    <label style={styles.field}>
+      <span style={styles.label}>
         {label}
         {required && <span style={{ color: "var(--status-danger)", marginLeft: 2 }}>*</span>}
-      </label>
+      </span>
       {children}
       {hint && <span style={styles.hint}>{hint}</span>}
-    </div>
+    </label>
   );
 }
 
@@ -522,14 +531,21 @@ function ConfirmModal({
   title: string; message: string; confirmLabel: string;
   confirmDisabled?: boolean; onConfirm: () => void; onClose: () => void;
 }) {
+  const dialogRef = useDialogFocus<HTMLDivElement>(onClose, !!confirmDisabled);
+  const titleId = useId();
   return (
     <div style={styles.overlay} onClick={onClose}>
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
         style={{ ...styles.modal, maxWidth: 420 }}
         onClick={(e) => e.stopPropagation()}
       >
         <div style={styles.modalHeader}>
-          <h3 style={styles.modalTitle}>{title}</h3>
+          <h3 id={titleId} style={styles.modalTitle}>{title}</h3>
         </div>
         <div style={styles.modalBody}>
           <p style={{ margin: 0, color: "var(--text-body)", lineHeight: 1.5 }}>{message}</p>
@@ -844,5 +860,29 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "inherit", width: "100%", boxSizing: "border-box",
   },
   hint: { fontSize: 12, color: "var(--text-label)" },
-  row2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 },
+  row2: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 190px), 1fr))", gap: 12 },
 };
+
+function useDialogFocus<T extends HTMLElement>(onClose: () => void, busy: boolean) {
+  const ref = useRef<T>(null);
+  const latest = useRef({ onClose, busy });
+  useEffect(() => { latest.current = { onClose, busy }; }, [onClose, busy]);
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    ref.current?.focus();
+    function keydown(e: KeyboardEvent) {
+      if (e.key === "Escape" && !latest.current.busy) { e.preventDefault(); latest.current.onClose(); }
+      if (e.key !== "Tab") return;
+      const elements = [...(ref.current?.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]') ?? [])].filter(el => el.getClientRects().length);
+      const first = elements[0], last = elements[elements.length - 1];
+      if (!first) { e.preventDefault(); return; }
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === ref.current)) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (document.activeElement === last || document.activeElement === ref.current)) { e.preventDefault(); first.focus(); }
+    }
+    document.addEventListener("keydown", keydown);
+    return () => { document.body.style.overflow = overflow; document.removeEventListener("keydown", keydown); previous?.focus(); };
+  }, []);
+  return ref;
+}

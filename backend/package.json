@@ -11,7 +11,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:invoices": "npm run build && node --test tests/invoices.test.js",
     "test:invoices:integration": "npm run build && node --test tests/invoices.integration.test.js",
-    "test:tenant-invoices": "npm run build && node --test tests/tenant-invoices.integration.test.js"
+    "test:tenant-invoices": "npm run build && node --test tests/tenant-invoices.integration.test.js",
+    "test:avatar": "npm run build && node --test tests/avatar.test.js"
   },
   "keywords": [],
   "author": "",
